@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Norte Rios institutional site: a Django REST backend (`norterios_site_backend/`) for a blog API, paired with a Vite+React frontend (`New-site-Norte/`). **These are two independently git-tracked projects** (each has its own `.git`) living side by side under this ungit-tracked parent directory — not a true monorepo. There is no root package.json/Makefile; the only thing that ties them together is the root `docker-compose.yml` + `.env`. The frontend has its own `New-site-Norte/CLAUDE.md` — read that when working there; this file covers the backend and the root-level orchestration.
+Norte Rios institutional site: a Django REST backend (`norterios_site_backend/`) for a blog API, paired with a Vite+React frontend (`New-site-Norte/`). **This is a single monorepo** — both live under one root `.git`, with the frontend's original commit history preserved via `git subtree` (imported from its previous standalone repo). There is no root package.json/Makefile; the only thing that ties the two projects together at build/run time is the root `docker-compose.yml` + `.env`. The frontend has its own `New-site-Norte/CLAUDE.md` — read that when working there; this file covers the backend and the root-level orchestration.
+
+No remote is configured on the root repo yet (the unification was done locally); `New-site-Norte/CLAUDE.md`'s mention of `github.com/NORTERIOS-DEV/New-site-Norte` refers to where the frontend used to live before the merge, not the current remote.
 
 `docs/` holds ad-hoc Portuguese planning notes for the blog feature (`blog-norte-rios-contexto-tecnico.md` is the original design doc; `ideias.md`/`observações.md` are open questions/TODOs, not settled facts).
 
