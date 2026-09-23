@@ -1,6 +1,5 @@
 import { Seo } from '../components/Seo'
 import { Hero } from '../sections/Hero'
-import { PublicacoesHome } from '../sections/PublicacoesHome'
 import { Problemas } from '../sections/Problemas'
 import { Diferenciais } from '../sections/Diferenciais'
 import { ProvaSocial } from '../sections/ProvaSocial'
@@ -16,7 +15,6 @@ export function HomePage() {
         description="A Norte Rios ajuda redes públicas e privadas a organizar a gestão, fortalecer professores e implementar práticas pedagógicas que melhoram o ensino, os indicadores e o uso dos recursos."
       />
       <Hero />
-      <PublicacoesHome />
       <Problemas />
       <Diferenciais />
       <ProvaSocial />

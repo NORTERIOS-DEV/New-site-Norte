@@ -27,15 +27,14 @@ All source is UTF-8 with Portuguese accents (`Publicações`, `Nº`). Preserve U
 
 `src/main.tsx` renders `<RouterProvider>`, imports the global stylesheets, and adds the `js` class to `<html>` unless `prefers-reduced-motion` is set (this class gates the reveal animation, mirroring the legacy behavior where no-JS visitors saw all content).
 
-`src/router.tsx` — routes plus permanent-style redirects from the legacy URLs (`/index.html`, `/publicacoes.html`, `/edital-002-2026.html`). `src/components/Layout.tsx` is the shared shell: `<Header>` + `<ScrollManager>` + `<Outlet>` + `<Footer>`.
+`src/router.tsx` — routes plus a permanent-style redirect from the legacy `/index.html` URL. `src/components/Layout.tsx` is the shared shell: `<Header>` + `<ScrollManager>` + `<Outlet>` + `<Footer>`.
 
-Routes: `/` (`HomePage`), `/publicacoes` (`PublicacoesPage`), `/publicacoes/:slug` (`EditalPage`, content from `getEdital(slug)`), `*` (`NotFoundPage`).
+Routes: `/` (`HomePage`), `/blog` (`BlogPage`), `/blog/:slug` (`BlogPostPage`), `*` (`NotFoundPage`).
 
 ### Styling — global CSS, ported near-verbatim (do not convert to CSS Modules)
 
 - `src/styles/tokens.css` — the brand `:root` custom properties (`--paper`, `--green-*`, `--teal-*`, `--orange-*`, `--forest`, `--ink*`, `--maxw`, `--r*`, `--shadow*`, font stacks), copied verbatim from the legacy `<style>`. Restyle by editing these, not literals.
 - `src/styles/global.css` — every other rule from the legacy global `<style>` (header, hero, sections, footer, reveal, media queries). The dead `.blog`/`.post` block and the Fraunces font were dropped.
-- `src/styles/edital.css` — the legacy edital-page second `<style>`; imported by `EditalPage`.
 - **Class names in JSX match this stylesheet exactly** (`.pub .pcover img`, `.panel .pside h3`, `.sec-head`, `.reveal`, …). That coupling is deliberate — keep using the legacy class names when editing markup; the CSS is not scoped.
 
 ### Legacy inline `<script>` → React
@@ -51,8 +50,6 @@ The single IIFE that every legacy page ran is now split into:
 
 ### Content model — `src/data/`
 
-- `publications.ts` — `Publicacao[]`. The first entry is featured on the home page; all are listed on `/publicacoes`. **Adding a publication = add an item here** (and, if it has a detail page, an entry in `editais.ts`).
-- `editais.ts` — full structured edital content keyed by slug (`cronograma`, `eixos`, `requisitos`, `documentos`, rich-text notes via `RichPart[]`), plus `getEdital(slug)`. `EditalPage` renders entirely from this; the card headings ("Cronograma de execução", etc.) are structural and live in the component.
 - `services.ts` — the 4 service areas (`adm`/`ped`/`fin`/`sis`) rendered by `ServiceTabs`.
 - `contact.ts` — phone, WhatsApp message presets, `waLink(msg)`, emails, Instagram, Maps URL, `formadoresUrl`.
 - `site.ts` — brand strings, `navItems`, `siteUrl`.
@@ -64,14 +61,12 @@ The single IIFE that every legacy page ran is now split into:
 
 ### Assets / SVG
 
-- The 2 base64 PNGs from the legacy featured-publication card were extracted to `src/assets/edital-002-2026-cover*.png` and are imported normally (Vite hashes them).
 - `components/LogoWordmark.tsx` (header) and `components/LogoMark.tsx` (footer, was `<symbol id="nr-mark">`) hold the logo SVG as JSX.
 - `components/icons.tsx` — the small 24×24 stroke icons that recurred throughout the legacy markup.
-- `public/docs/*.pdf` — the 5 edital attachments, linked from `EditalPage` as `/docs/...`.
 
 ### Navigation / anchors
 
-Nav links resolve to `#anchor` on the home route and `/#anchor` elsewhere; `ScrollManager` scrolls to the hash target (or top) on every navigation. Preserved element ids: `top`, `publicacoes`, `sobre`, `servicos`, `contato`, `documentos`, `adm`/`ped`/`fin`/`sis`.
+Nav links resolve to `#anchor` on the home route and `/#anchor` elsewhere; `ScrollManager` scrolls to the hash target (or top) on every navigation. Preserved element ids: `top`, `sobre`, `servicos`, `contato`, `adm`/`ped`/`fin`/`sis`.
 
 ### External integrations
 

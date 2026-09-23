@@ -4,7 +4,7 @@ import { Seo } from '../components/Seo'
 import { Reveal } from '../components/Reveal'
 import { SafeHtml } from '../components/SafeHtml'
 import { BlogPostCard } from '../components/BlogPostCard'
-import { IconCalendar, IconGlobe, IconInstagram, IconUser, IconWhatsApp } from '../components/icons'
+import { IconCalendar, IconInstagram, IconUser, IconWhatsApp } from '../components/icons'
 import { NotFoundPage } from './NotFoundPage'
 import { getPostBySlug, getPosts } from '../services/blogApi'
 import { contact, waLink, waMessages } from '../data/contact'
@@ -171,12 +171,6 @@ export function BlogPostPage() {
                   </span>
                   Falar no WhatsApp
                 </a>
-                <Link to="/publicacoes">
-                  <span className="pli">
-                    <IconGlobe />
-                  </span>
-                  Ver publicações
-                </Link>
                 <a href={contact.instagram} target="_blank" rel="noopener">
                   <span className="pli">
                     <IconInstagram />
