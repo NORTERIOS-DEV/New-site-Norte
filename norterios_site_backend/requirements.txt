@@ -1,0 +1,10 @@
+Django==6.1.1
+djangorestframework==3.18.1
+django-cors-headers
+django-storages[s3]
+django-ckeditor-5
+Pillow
+django-environ
+psycopg[binary]
+gunicorn
+whitenoise

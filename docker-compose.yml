@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-norterios_blog}
+      POSTGRES_USER: ${POSTGRES_USER:-norterios}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-norterios}
+    ports:
+      - "5442:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-norterios}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-norterios}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-norterios123}
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY:-norterios} ${MINIO_SECRET_KEY:-norterios123} &&
+      mc mb -p local/${MINIO_BUCKET_NAME:-norterios-blog} &&
+      mc anonymous set download local/${MINIO_BUCKET_NAME:-norterios-blog}
+      "
+
+  web:
+    build: ./norterios_site_backend
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: '5432'
+      MINIO_ENDPOINT_URL: http://minio:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./norterios_site_backend:/app
+
+volumes:
+  pgdata:
+  miniodata:
