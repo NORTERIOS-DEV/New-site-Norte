@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -44,12 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'django_ckeditor_5',
     'adminsortable2',
     'storages',
+    'accounts',
     'blog',
     'galeria',
+    'uploads',
 ]
 
 MIDDLEWARE = [
@@ -202,6 +206,16 @@ CKEDITOR_5_CONFIGS = {
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+}
+
+
+# Simple JWT (auth for /api/painel/ only - public endpoints stay AllowAny)
+# https://django-rest-framework-simplejwt.readthedocs.io/
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 

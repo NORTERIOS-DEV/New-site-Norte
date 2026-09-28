@@ -21,5 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('blog.urls')),
     path('api/galeria/', include('galeria.urls')),
+    path('api/painel/auth/', include('accounts.urls')),
+    path('api/painel/', include('blog.urls_painel')),
+    path('api/painel/galeria/', include('galeria.urls_painel')),
+    path('api/painel/uploads/', include('uploads.urls')),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
