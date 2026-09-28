@@ -3,6 +3,7 @@ djangorestframework==3.18.1
 django-cors-headers
 django-storages[s3]
 django-ckeditor-5
+django-admin-sortable2
 Pillow
 django-environ
 psycopg[binary]

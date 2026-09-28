@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p>Selecione uma ou várias imagens. Cada arquivo enviado vira uma foto nova neste álbum, adicionada ao final da lista.</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <p>
+    <input type="file" name="fotos" multiple accept="image/*" required>
+  </p>
+  <div class="submit-row">
+    <input type="submit" value="Enviar fotos" class="default">
+    <a href="{% url 'admin:galeria_album_change' album.pk %}" class="button cancel-link">Voltar ao álbum</a>
+  </div>
+</form>
+{% endblock %}

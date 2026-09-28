@@ -36,7 +36,7 @@ Frontend dev server: `npm run dev` in `New-site-Norte/` (port 5173, Vite default
 
 ## Backend architecture (`norterios_site_backend/`)
 
-Django 6.1 + DRF project, single app: `blog`.
+Django 6.1 + DRF project, two apps: `blog` and `galeria`.
 
 - **Models** (`blog/models.py`): `Categoria` (nome, slug) and `Post` (titulo, slug — auto-generated from titulo with collision suffixing in `save()`, resumo, `conteudo` as a `CKEditor5Field`, `imagem_capa` uploading to `blog/capas/%Y/%m/`, `autor` FK to the user model (`PROTECT`), `categoria` FK (`SET_NULL`), `status` rascunho/publicado, `data_criacao`/`data_atualizacao` auto timestamps, `data_publicacao` auto-set to now on first publish). Default ordering `-data_publicacao, -data_criacao`.
 - **Views** (`blog/views.py`): `PostViewSet` and `CategoriaViewSet`, both `ReadOnlyModelViewSet` (list/retrieve only — no write API; all authoring happens via Django Admin). `PostViewSet` filters the public queryset to `status=publicado` AND `data_publicacao <= now` (drafts and future-scheduled posts are hidden), supports `?categoria=<slug>`, and swaps in `PostDetailSerializer` (adds `conteudo`) vs `PostListSerializer` (summary only) based on action.
@@ -45,8 +45,12 @@ Django 6.1 + DRF project, single app: `blog`.
 - **Admin** (`blog/admin.py`): prepopulated slugs, list filters on status/categoria, and `PostAdmin.save_model` auto-assigns `request.user` as `autor` when unset. This is the only content-authoring surface right now (no write API).
 - **File storage**: `django-storages` + MinIO (S3-compatible) for both `imagem_capa` and CKEditor inline images — nothing is written to local disk/`MEDIA_ROOT` in this setup.
 - **CORS**: `django-cors-headers`, `CORS_ALLOWED_ORIGINS` read from env (see the `.env` gotcha above).
-- **Migrations**: only `blog/migrations/0001_initial.py` exists so far — the models above are the entire current schema.
-- **Tests**: `blog/tests.py` is empty Django boilerplate; no tests exist yet. Standard Django test runner applies: `python manage.py test` / `python manage.py test blog` / `python manage.py test blog.tests.SomeTestCase.test_method` (no pytest-django in requirements.txt).
+- **Migrations**: `blog/migrations/` has `0001_initial.py` and `0002_post_destaque.py`; `galeria/migrations/` has `0001_initial.py`.
+- **Tests**: `blog/tests.py` is empty Django boilerplate; no tests exist there. `galeria/tests.py` has real coverage (model/thumbnail-generation/API tests). Standard Django test runner applies: `python manage.py test` / `python manage.py test blog` / `python manage.py test galeria` (no pytest-django in requirements.txt).
+
+### `galeria` app — photo albums
+
+`Album` (titulo, slug auto-generated like `Post`, descricao, data_evento, capa opcional, publicado, ordem) and `Foto` (FK `album` CASCADE, imagem original, miniatura + imagem_media auto-generated, legenda, alt, largura/altura, ordem). On save, `galeria/services.py` uses Pillow to fix EXIF orientation, strip metadata, and re-encode the original, then generates a ~400px thumbnail and a ~1200px medium version as WebP — synchronously in `Foto.save()` (no Celery/Redis in this stack). `galeria/signals.py` deletes the image files from MinIO via `post_delete` (covers cascade deletes too, e.g. deleting an `Album`). Admin (`galeria/admin.py`) uses `adminsortable2` (PyPI: `django-admin-sortable2`, but the importable module is `adminsortable2`, not `django_admin_sortable2`) for drag-and-drop photo reordering, plus a custom bulk-upload view (`<int:album_id>/upload-fotos/`) for adding many photos at once. Read-only API mounted at `path('api/galeria/', include('galeria.urls'))`: `GET /api/galeria/albuns/`, `GET /api/galeria/albuns/<slug>/`, `GET /api/galeria/albuns/<slug>/fotos/` (paginated), all filtered to `publicado=True`.
 
 Common commands (inside the `web` container, e.g. `docker compose exec web <cmd>`, or locally with a venv in `norterios_site_backend/`):
 

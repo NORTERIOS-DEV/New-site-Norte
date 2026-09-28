@@ -46,8 +46,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_ckeditor_5',
+    'adminsortable2',
     'storages',
     'blog',
+    'galeria',
 ]
 
 MIDDLEWARE = [
@@ -164,6 +166,9 @@ AWS_S3_FILE_OVERWRITE = False
 # Local MinIO runs plain HTTP; point this at 'https:' once a TLS-terminating proxy
 # sits in front of MinIO/S3 in production.
 AWS_S3_URL_PROTOCOL = env('MINIO_URL_PROTOCOL', default='http:')
+# Safe long TTL: AWS_S3_FILE_OVERWRITE=False means a re-uploaded file always gets a
+# new name, so a cached URL never serves stale content.
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=2592000, public'}
 
 
 # django-ckeditor-5
