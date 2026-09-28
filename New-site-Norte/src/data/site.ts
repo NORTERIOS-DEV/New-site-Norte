@@ -8,6 +8,7 @@ export const brand = {
 export const navItems: NavItem[] = [
   { label: 'Início', anchor: 'top' },
   { label: 'Blog', to: '/blog' },
+  { label: 'Galeria', to: '/galeria' },
   { label: 'Sobre', anchor: 'sobre' },
   { label: 'Serviços', anchor: 'servicos' },
   { label: 'Contato', anchor: 'contato' },

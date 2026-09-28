@@ -29,7 +29,7 @@ All source is UTF-8 with Portuguese accents (`Publicações`, `Nº`). Preserve U
 
 `src/router.tsx` — routes plus a permanent-style redirect from the legacy `/index.html` URL. `src/components/Layout.tsx` is the shared shell: `<Header>` + `<ScrollManager>` + `<Outlet>` + `<Footer>`.
 
-Routes: `/` (`HomePage`), `/blog` (`BlogPage`), `/blog/:slug` (`BlogPostPage`), `*` (`NotFoundPage`).
+Routes: `/` (`HomePage`), `/blog` (`BlogPage`), `/blog/:slug` (`BlogPostPage`), `/galeria` (`GaleriaPage`), `/galeria/:slug` (`GaleriaAlbumPage`), `*` (`NotFoundPage`).
 
 ### Styling — global CSS, ported near-verbatim (do not convert to CSS Modules)
 
