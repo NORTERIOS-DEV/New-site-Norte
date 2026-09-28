@@ -141,14 +141,17 @@ export function BlogPostPage() {
                 {post.autor_nome}
               </span>
             </div>
+          </Reveal>
 
+          <Reveal className="post-main-card">
             {post.imagem_capa && (
               <div className="post-hero-cover">
                 <img src={post.imagem_capa} alt={post.titulo} />
               </div>
             )}
-
-            <SafeHtml className="post-content" html={post.conteudo} />
+            <div className="post-body-card">
+              <SafeHtml className="post-content" html={post.conteudo} />
+            </div>
           </Reveal>
 
           <Reveal className="post-footer">

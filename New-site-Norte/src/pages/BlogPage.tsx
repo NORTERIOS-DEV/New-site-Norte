@@ -109,7 +109,7 @@ export function BlogPage() {
 
       <BlogDestaques />
 
-      <section className="sec" aria-label="Publicações do blog">
+      <section className="sec blog-sec" aria-label="Publicações do blog">
         <div className="wrap">
           <div className="blog-filters">
             <div className="blog-search">

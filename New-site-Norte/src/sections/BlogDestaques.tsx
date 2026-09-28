@@ -27,7 +27,7 @@ export function BlogDestaques() {
   if (!posts || posts.length === 0) return null
 
   return (
-    <section className="sec" id="blog-destaques" aria-label="Destaques do blog">
+    <section className="sec blog-sec" id="blog-destaques" aria-label="Destaques do blog">
       <div className="wrap">
         <Reveal className="sec-head">
           <span className="eyebrow">Edu Norte</span>

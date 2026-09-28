@@ -6,6 +6,10 @@
    without the .sun — see sections/Hero.tsx for the full version. */
 .hero.blog-hero-sec {
   padding: 32px 0 0;
+  background: #fff;
+}
+.blog-sec {
+  background: #fff;
 }
 .blog-hero-sec .wrap {
   position: relative;
@@ -165,6 +169,7 @@
 .post {
   overflow: hidden;
   background: #fff;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
 }
@@ -382,21 +387,36 @@
 }
 
 .post-detail-sec {
-  background: #f2f2f2;
+  background: #fff;
+}
+
+.post-main-card {
+  background: #fff;
+  border-radius: var(--r-lg);
+  box-shadow: 0 10px 32px -8px rgba(48, 76, 56, 0.18);
+  overflow: hidden;
+  margin: 28px 0 40px;
 }
 
 .post-hero-cover {
   aspect-ratio: 21/8;
-  border-radius: var(--r-lg);
   overflow: hidden;
   background: var(--green-100);
-  margin: 28px 0 40px;
 }
 .post-hero-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.post-body-card {
+  padding: 48px;
+}
+@media (max-width: 760px) {
+  .post-body-card {
+    padding: 28px 24px;
+  }
 }
 
 .post-content {
@@ -442,13 +462,19 @@
 }
 
 .post-footer {
-  margin-top: 56px;
-  padding-top: 40px;
-  border-top: 1px solid rgba(105, 157, 106, 0.16);
+  margin-top: 40px;
+  background: #fff;
+  border-radius: var(--r-lg);
+  box-shadow: 0 10px 32px -8px rgba(48, 76, 56, 0.18);
+  padding: 40px 48px;
   display: flex;
   flex-direction: column;
   gap: 40px;
-  max-width: 760px;
+}
+@media (max-width: 760px) {
+  .post-footer {
+    padding: 28px 24px;
+  }
 }
 
 .post-author {
@@ -518,5 +544,31 @@
   max-width: none;
 }
 .post-related .blog-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
   margin-top: 4px;
+}
+.post-related .blog-grid .post .body {
+  padding: 1.3em;
+}
+.post-related .blog-grid .post h3 {
+  font-size: 1.1rem;
+  margin: 8px 0 6px;
+}
+.post-related .blog-grid .post p {
+  font-size: 0.92rem;
+}
+.post-related .blog-grid .post .pdates {
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+}
+.post-related .blog-grid .post .more {
+  margin-top: 14px;
+  padding: 10px 18px;
+  font-size: 0.78rem;
+}
+@media (max-width: 860px) {
+  .post-related .blog-grid {
+    grid-template-columns: 1fr;
+  }
 }
