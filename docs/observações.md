@@ -31,3 +31,10 @@ Docker: container separado pra Django+Gunicorn, container pra Postgres, containe
 ### páginas a adicionar
 
 galeria de fotos
+
+tamanho das fotos 
+largula 466px
+altura 496 px
+responsiva para celular
+
+ao abrir a foto deve ocupar 80% da altura disponivel e o fundo da lateral deve ser um pouca mais trasparente, alem disso coloque um efeito de transição ao passar a foto

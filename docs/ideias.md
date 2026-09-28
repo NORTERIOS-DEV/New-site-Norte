@@ -1,6 +1,6 @@
 ### Blog
 
-### Página de posts
+## Página de posts
 
 ### Seção Hero 
 Edu Norte 
@@ -19,3 +19,11 @@ Na página de detalhe do post minha referência vai ser desse site https://educa
 ### seção: Problemas & soluções
 referência:
 https://www.themesindustry.com/html/edua/index4.html
+
+### seção com uma pre vizualização do blog, com as noticias em destaque e um botão de ver mais
+seção de pre vizualização da galeria de fotos 
+https://demoxml.com/html/kanop/index.html
+https://wp.hostlin.com/alicante/gallery.html
+
+https://matchthemes.com/demohtml/gleam/albums-grid-v4.html
+https://matchthemes.com/demohtml/gleam/portfolio-masonry-2cols.html
