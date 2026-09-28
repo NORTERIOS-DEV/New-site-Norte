@@ -1,0 +1,578 @@
+/* Área /painel - estilo próprio, independente do site público (global.css). */
+
+.painel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font: 500 1rem var(--font-body, system-ui, sans-serif);
+  color: #475467;
+}
+
+.painel-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f5f6f8;
+  font-family: system-ui, sans-serif;
+}
+
+.painel-login-form {
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.painel-login-form h1 {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem;
+  color: #101828;
+}
+
+.painel-login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: #344054;
+  font-weight: 500;
+}
+
+.painel-login-form input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.painel-login-form button {
+  margin-top: 0.5rem;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #1c6e4a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.painel-login-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.painel-field-error {
+  color: #d92d20;
+  font-size: 0.8rem;
+}
+
+.painel-form-error {
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  color: #b42318;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.painel-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6f8;
+  font-family: system-ui, sans-serif;
+  color: #101828;
+}
+
+.painel-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #101828;
+  color: #f2f4f7;
+  display: flex;
+  flex-direction: column;
+}
+
+.painel-sidebar-brand {
+  padding: 1.25rem 1.25rem 1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.painel-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  gap: 0.15rem;
+}
+
+.painel-sidebar nav a {
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  color: #cecfd2;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.painel-sidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.painel-sidebar nav a.active {
+  background: #1c6e4a;
+  color: #fff;
+}
+
+.painel-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.painel-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0.85rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #eaecf0;
+  font-size: 0.875rem;
+}
+
+.painel-topbar button {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.painel-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+/* Telas de CRUD (Categorias, Autores, Posts, Galeria) */
+
+.painel-crud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.painel-crud-header h1 {
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.painel-crud-header button,
+.painel-primary-button {
+  border: none;
+  background: #1c6e4a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.painel-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.painel-filters input,
+.painel-filters select {
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.painel-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+.painel-table th,
+.painel-table td {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid #eaecf0;
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.painel-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #475467;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.painel-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.painel-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.painel-table-actions button,
+.painel-table-actions a {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.painel-table-actions button.destrutivo {
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.painel-status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.painel-status-badge.publicado {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.painel-status-badge.rascunho {
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.painel-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f2f4f7;
+}
+
+.painel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1rem;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.painel-modal {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.painel-modal h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.painel-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #344054;
+}
+
+.painel-modal label.painel-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.painel-modal input[type='text'],
+.painel-modal input[type='date'],
+.painel-modal input:not([type]),
+.painel-modal textarea,
+.painel-modal select {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.painel-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.painel-modal-actions button {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.painel-modal-actions button[type='button'] {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+}
+
+.painel-modal-actions button[type='submit'] {
+  border: none;
+  background: #1c6e4a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.painel-modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.painel-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: #667085;
+  font-size: 0.875rem;
+}
+
+.painel-pagination {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.painel-pagination button {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.painel-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Formulário de postagem */
+
+.painel-post-form {
+  max-width: 860px;
+}
+
+.painel-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.painel-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #344054;
+}
+
+.painel-form-grid label.painel-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.painel-form-grid input,
+.painel-form-grid select,
+.painel-form-grid textarea {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.painel-editor-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #344054;
+  margin-bottom: 1.25rem;
+}
+
+.painel-form-warning {
+  background: #fffaeb;
+  border: 1px solid #fedf89;
+  color: #b54708;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+.painel-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.painel-form-actions button {
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.painel-form-actions button[type='button'] {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+}
+
+.painel-form-actions button[type='submit'] {
+  border: none;
+  background: #1c6e4a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.painel-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Galeria - upload em lote e grade de fotos reordenável */
+
+.painel-gallery-fotos {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eaecf0;
+}
+
+.painel-gallery-fotos h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.painel-gallery-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.painel-gallery-uploader > button {
+  border: none;
+  background: #1c6e4a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.painel-gallery-uploader > button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.painel-upload-result {
+  font-size: 0.8rem;
+  color: #475467;
+  text-align: right;
+}
+
+.painel-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.painel-photo-item {
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  cursor: grab;
+  touch-action: none;
+}
+
+.painel-photo-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #f2f4f7;
+}
+
+.painel-photo-item input {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: text;
+}
+
+.painel-photo-item button {
+  align-self: flex-start;
+  border: 1px solid #fecdca;
+  color: #b42318;
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
