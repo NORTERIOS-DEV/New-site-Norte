@@ -1,3 +1,5 @@
+import type { JSONContent } from '@tiptap/core'
+
 export type Categoria = {
   id: number
   nome: string
@@ -14,10 +16,14 @@ export type PostListItem = {
   categoria: Categoria | null
   data_publicacao: string
   destaque: boolean
+  tempo_leitura_minutos: number | null
 }
 
 export type PostDetail = PostListItem & {
+  /** HTML legado (CKEditor5) - só preenchido em posts criados antes do editor
+   * TipTap; SafeContent usa conteudo_json quando presente e cai pra isso. */
   conteudo: string
+  conteudo_json: JSONContent | null
 }
 
 export type Paginated<T> = {

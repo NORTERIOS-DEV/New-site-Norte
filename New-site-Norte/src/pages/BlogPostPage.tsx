@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Seo } from '../components/Seo'
 import { Reveal } from '../components/Reveal'
-import { SafeHtml } from '../components/SafeHtml'
+import { SafeContent } from '../components/SafeContent'
 import { BlogPostCard } from '../components/BlogPostCard'
 import { IconCalendar, IconInstagram, IconUser, IconWhatsApp } from '../components/icons'
 import { NotFoundPage } from './NotFoundPage'
@@ -150,7 +150,7 @@ export function BlogPostPage() {
               </div>
             )}
             <div className="post-body-card">
-              <SafeHtml className="post-content" html={post.conteudo} />
+              <SafeContent className="post-content" html={post.conteudo} json={post.conteudo_json} />
             </div>
           </Reveal>
 
