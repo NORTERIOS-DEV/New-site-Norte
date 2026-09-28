@@ -16,14 +16,14 @@ class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'id', 'titulo', 'slug', 'resumo', 'imagem_capa',
-            'autor_nome', 'categoria', 'data_publicacao', 'destaque',
+            'id', 'titulo', 'slug', 'resumo', 'imagem_capa', 'autor_nome',
+            'categoria', 'data_publicacao', 'destaque', 'tempo_leitura_minutos',
         ]
 
     def get_autor_nome(self, obj):
-        return obj.autor.get_full_name() or obj.autor.username
+        return obj.autor.nome
 
 
 class PostDetailSerializer(PostListSerializer):
     class Meta(PostListSerializer.Meta):
-        fields = PostListSerializer.Meta.fields + ['conteudo']
+        fields = PostListSerializer.Meta.fields + ['conteudo', 'conteudo_json']

@@ -1,12 +1,20 @@
 from django.contrib import admin
 
-from .models import Categoria, Post
+from .models import Autor, Categoria, Post
 
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('nome',)}
-    list_display = ('nome', 'slug')
+    list_display = ('nome', 'slug', 'ativo')
+    list_filter = ('ativo',)
+    search_fields = ('nome',)
+
+
+@admin.register(Autor)
+class AutorAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'cargo', 'ativo')
+    list_filter = ('ativo',)
     search_fields = ('nome',)
 
 
@@ -18,9 +26,4 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = ('destaque',)
     search_fields = ('titulo', 'resumo')
     readonly_fields = ('data_criacao', 'data_atualizacao')
-    autocomplete_fields = ('categoria',)
-
-    def save_model(self, request, obj, form, change):
-        if not obj.autor_id:
-            obj.autor = request.user
-        super().save_model(request, obj, form, change)
+    autocomplete_fields = ('categoria', 'autor')
