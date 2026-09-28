@@ -1,7 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
+import { AuthProvider } from './context/AuthContext'
 
 import './styles/tokens.css'
 import './styles/global.css'
@@ -13,8 +15,14 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   document.documentElement.classList.add('js')
 }
 
+const queryClient = new QueryClient()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
