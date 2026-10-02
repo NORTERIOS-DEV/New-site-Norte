@@ -82,19 +82,26 @@
   border: 0;
 }
 
-/* Tooltip customizado para os botões da toolbar: substitui o `title` nativo
-   (balão desenhado pelo SO, não estilizável) por um balão em CSS próprio,
-   com sombra só externa. */
-[data-tooltip] {
+/* Tooltip customizado para os botões da toolbar e do bubble menu do editor:
+   substitui o `title` nativo (balão desenhado pelo SO, não estilizável) por
+   um balão em CSS próprio, com sombra só externa. Escopado a
+   `.tiptap-toolbar`/`.tiptap-bubble-menu` (em vez do seletor genérico
+   `[data-tooltip]` usado pelo resto do painel, ver styles/painel.css) porque
+   aqui o balão abre para BAIXO: essas barras ficam coladas ao topo do editor,
+   então um balão abrindo para cima (padrão do painel) nasce fora da área
+   visível/acima do viewport. */
+.tiptap-toolbar [data-tooltip],
+.tiptap-bubble-menu [data-tooltip] {
   position: relative;
 }
 
-[data-tooltip]::after {
+.tiptap-toolbar [data-tooltip]::after,
+.tiptap-bubble-menu [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 0.4rem);
-  transform: translate(-50%, 4px);
+  top: calc(100% + 0.4rem);
+  transform: translate(-50%, -4px);
   padding: 0.3rem 0.55rem;
   border-radius: 6px;
   background: #1f2937;
@@ -111,8 +118,10 @@
   z-index: 60;
 }
 
-[data-tooltip]:hover::after,
-[data-tooltip]:focus-visible::after {
+.tiptap-toolbar [data-tooltip]:hover::after,
+.tiptap-toolbar [data-tooltip]:focus-visible::after,
+.tiptap-bubble-menu [data-tooltip]:hover::after,
+.tiptap-bubble-menu [data-tooltip]:focus-visible::after {
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, 0);
