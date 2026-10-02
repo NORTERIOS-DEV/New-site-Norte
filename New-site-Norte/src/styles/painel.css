@@ -1,12 +1,18 @@
 /* Área /painel - estilo próprio, independente do site público (global.css). */
 
+:root {
+  /* Fonte única da altura-base de .painel-image-drop e .painel-textarea-match-image -
+     mudar aqui mantém os dois em sincronia. */
+  --painel-image-input-height: 140px;
+}
+
 .painel-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
   font: 500 1rem var(--font-body, system-ui, sans-serif);
-  color: #475467;
+  color: var(--ink-soft);
 }
 
 .painel-login {
@@ -14,8 +20,8 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f5f6f8;
-  font-family: system-ui, sans-serif;
+  background: var(--paper);
+  font-family: var(--b-font);
 }
 
 .painel-login-form {
@@ -23,17 +29,28 @@
   max-width: 360px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
+  box-shadow: 0 1px 3px rgba(48, 76, 56, 0.1), 0 1px 2px rgba(48, 76, 56, 0.06);
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
 }
 
+.painel-login-logo {
+  align-self: center;
+  margin-bottom: 0.25rem;
+}
+
+.painel-login-logo .logo-h {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
 .painel-login-form h1 {
   font-size: 1.25rem;
   margin: 0 0 0.5rem;
-  color: #101828;
+  color: var(--forest);
 }
 
 .painel-login-form label {
@@ -41,7 +58,7 @@
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.875rem;
-  color: #344054;
+  color: var(--ink-soft);
   font-weight: 500;
 }
 
@@ -57,7 +74,7 @@
   padding: 0.65rem 1rem;
   border: none;
   border-radius: 8px;
-  background: #1c6e4a;
+  background: var(--orange-600);
   color: #fff;
   font-weight: 600;
   font-size: 0.95rem;
@@ -69,9 +86,21 @@
   cursor: not-allowed;
 }
 
+.painel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 .painel-field-error {
   color: #d92d20;
   font-size: 0.8rem;
+}
+
+.painel-field-hint {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 400;
 }
 
 .painel-form-error {
@@ -84,28 +113,119 @@
   margin: 0;
 }
 
+/* Indicador de autosave em PostFormPage - texto discreto perto do cabeçalho,
+   sem toast (toast é só pro "Salvar" manual e ações explícitas, ou viraria
+   ruído a cada 2.5s de digitação). */
+.painel-autosave-status {
+  margin: -0.5rem 0 1rem;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.painel-autosave-status[data-status='erro'] {
+  color: #b42318;
+}
+
 .painel-shell {
   display: flex;
-  min-height: 100vh;
-  background: #f5f6f8;
-  font-family: system-ui, sans-serif;
-  color: #101828;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--paper);
+  font-family: var(--b-font);
+  color: var(--ink);
+}
+
+.painel-sidebar-backdrop {
+  display: none;
+}
+
+.painel-sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.painel-sidebar-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--forest);
+  border-radius: 2px;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.painel-sidebar-toggle span::before,
+.painel-sidebar-toggle span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: var(--forest);
+  border-radius: 2px;
+  transition: transform 0.15s ease, top 0.15s ease;
+}
+
+.painel-sidebar-toggle span::before {
+  top: -6px;
+}
+
+.painel-sidebar-toggle span::after {
+  top: 6px;
+}
+
+.painel-shell.sidebar-open .painel-sidebar-toggle span {
+  background: transparent;
+}
+
+.painel-shell.sidebar-open .painel-sidebar-toggle span::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.painel-shell.sidebar-open .painel-sidebar-toggle span::after {
+  top: 0;
+  transform: rotate(-45deg);
 }
 
 .painel-sidebar {
   width: 220px;
   flex-shrink: 0;
-  background: #101828;
-  color: #f2f4f7;
+  background: var(--forest);
+  color: var(--paper-2);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .painel-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   padding: 1.25rem 1.25rem 1rem;
+  font-family: var(--d-font);
   font-weight: 700;
   font-size: 1.05rem;
+  color: #fff;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.painel-sidebar-logo {
+  width: 32px;
+  height: 25px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 6px;
 }
 
 .painel-sidebar nav {
@@ -118,7 +238,7 @@
 .painel-sidebar nav a {
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  color: #cecfd2;
+  color: rgba(239, 246, 235, 0.75);
   text-decoration: none;
   font-size: 0.9rem;
 }
@@ -129,13 +249,14 @@
 }
 
 .painel-sidebar nav a.active {
-  background: #1c6e4a;
+  background: var(--orange-600);
   color: #fff;
 }
 
 .painel-main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -143,12 +264,21 @@
 .painel-topbar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 1rem;
   padding: 0.85rem 1.5rem;
   background: #fff;
-  border-bottom: 1px solid #eaecf0;
+  border-bottom: 1px solid var(--green-100);
   font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.painel-topbar-user {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .painel-topbar button {
@@ -162,16 +292,19 @@
 
 .painel-content {
   flex: 1;
+  min-height: 0;
   padding: 1.5rem;
   overflow-x: auto;
+  overflow-y: auto;
 }
 
 /* Telas de CRUD (Categorias, Autores, Posts, Galeria) */
 
 .painel-crud-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 0.9rem;
   margin-bottom: 1.25rem;
 }
 
@@ -180,16 +313,119 @@
   margin: 0;
 }
 
+.painel-crud-header-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.painel-crud-header-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+  background: var(--orange-200);
+  color: var(--orange-600);
+}
+
+.painel-crud-header-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.painel-crud-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.painel-crud-header-description {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.painel-crud-header-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.painel-crud-header-actions .painel-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.15s ease;
+}
+
+.painel-crud-header-actions .painel-back-button:hover {
+  filter: brightness(0.97);
+}
+
+.painel-crud-header-actions .painel-back-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 .painel-crud-header button,
 .painel-primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   border: none;
-  background: #1c6e4a;
+  background: var(--orange-600);
   color: #fff;
   border-radius: 8px;
   padding: 0.55rem 1rem;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.15s ease;
+}
+
+.painel-crud-header button::-moz-focus-inner,
+.painel-primary-button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+.painel-crud-header button svg,
+.painel-primary-button svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.painel-crud-header button:hover,
+.painel-primary-button:hover {
+  filter: brightness(0.93);
+}
+
+.painel-primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: none;
 }
 
 .painel-filters {
@@ -213,22 +449,22 @@
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  box-shadow: 0 1px 2px rgba(48, 76, 56, 0.06);
 }
 
 .painel-table th,
 .painel-table td {
   text-align: left;
   padding: 0.65rem 0.9rem;
-  border-bottom: 1px solid #eaecf0;
+  border-bottom: 1px solid var(--green-100);
   font-size: 0.875rem;
   vertical-align: middle;
 }
 
 .painel-table th {
-  background: #f9fafb;
+  background: var(--paper-2);
   font-weight: 600;
-  color: #475467;
+  color: var(--ink-soft);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -238,27 +474,100 @@
   border-bottom: none;
 }
 
+.painel-table td.painel-table-cell-actions {
+  white-space: nowrap;
+}
+
 .painel-table-actions {
   display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
+  gap: 0.4rem;
 }
 
 .painel-table-actions button,
 .painel-table-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: 1px solid #d0d5dd;
   background: #fff;
   border-radius: 6px;
-  padding: 0.3rem 0.65rem;
-  font-size: 0.78rem;
+  padding: 0;
   cursor: pointer;
-  color: inherit;
+  color: var(--ink-soft);
   text-decoration: none;
+}
+
+.painel-table-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+.painel-table-actions button:hover,
+.painel-table-actions a:hover {
+  background: var(--paper-2);
+  color: var(--ink);
 }
 
 .painel-table-actions button.destrutivo {
   border-color: #fecdca;
   color: #b42318;
+}
+
+.painel-table-actions button.destrutivo:hover {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+/* Texto acessível para leitores de tela em botões só-de-ícone (tooltip via
+   `data-tooltip` cobre o hover visual; isto cobre o nome acessível/VoiceOver). */
+.painel-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Tooltip customizado para botões só-de-ícone: substitui o atributo `title`
+   nativo (cujo balão é desenhado pelo SO/navegador e não pode ser
+   estilizado) por um balão em CSS, com sombra só externa. */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.4rem);
+  transform: translate(-50%, 4px);
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  background: var(--ink, #1f2937);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 60;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
 }
 
 .painel-status-badge {
@@ -270,13 +579,18 @@
 }
 
 .painel-status-badge.publicado {
-  background: #ecfdf3;
-  color: #067647;
+  background: var(--green-100);
+  color: var(--green-600);
 }
 
 .painel-status-badge.rascunho {
-  background: #f2f4f7;
-  color: #475467;
+  background: var(--orange-200);
+  color: #8a4610;
+}
+
+.painel-status-badge.agendado {
+  background: var(--teal-200);
+  color: var(--teal-700);
 }
 
 .painel-thumb {
@@ -284,15 +598,19 @@
   height: 48px;
   border-radius: 8px;
   object-fit: cover;
-  background: #f2f4f7;
+  background: var(--paper-2);
 }
 
 .painel-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(16, 24, 40, 0.45);
+  background: rgba(48, 76, 56, 0.45);
   display: flex;
-  align-items: flex-start;
+  /* `safe center`: centraliza verticalmente quando o modal cabe na tela, mas
+     recua para o topo (em vez de cortar o conteúdo) em telas baixas ou
+     formulários mais altos - evita usar align-items: flex-start fixo, que
+     deixava o modal sempre colado no topo com sobra de espaço embaixo. */
+  align-items: safe center;
   justify-content: center;
   padding: 3rem 1rem;
   overflow-y: auto;
@@ -310,6 +628,65 @@
   gap: 0.85rem;
 }
 
+/* Modais com formulário maior (ex.: autor, com 9 campos) - mais largo para
+   caber duas colunas e reduzir a altura em vez de empilhar tudo. */
+.painel-modal-wide {
+  max-width: 640px;
+}
+
+/* Modal de pré-visualização do post (PostPreviewModal) - mais largo que os
+   demais modais do painel pra caber o layout do post de verdade, com o corpo
+   rolando internamente em vez do modal estourar a altura da viewport. */
+.painel-modal-preview {
+  max-width: 900px;
+  max-height: 90vh;
+  padding: 0;
+  overflow: hidden;
+}
+
+.painel-modal-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--green-100);
+  flex-shrink: 0;
+}
+
+.painel-modal-preview-header h2 {
+  margin: 0;
+}
+
+.painel-modal-preview-close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ink-soft);
+  padding: 0.25rem 0.5rem;
+}
+
+.painel-modal-preview-close:hover {
+  color: var(--ink);
+}
+
+.painel-modal-preview-body {
+  overflow-y: auto;
+  padding: 1.75rem;
+}
+
+.painel-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1.25rem;
+}
+
+.painel-modal-grid .painel-field-full,
+.painel-modal-grid label.painel-checkbox {
+  grid-column: 1 / -1;
+}
+
 .painel-modal h2 {
   margin: 0 0 0.25rem;
   font-size: 1.1rem;
@@ -321,7 +698,7 @@
   gap: 0.35rem;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #344054;
+  color: var(--ink-soft);
 }
 
 .painel-modal label.painel-checkbox {
@@ -332,6 +709,7 @@
 
 .painel-modal input[type='text'],
 .painel-modal input[type='date'],
+.painel-modal input[type='url'],
 .painel-modal input:not([type]),
 .painel-modal textarea,
 .painel-modal select {
@@ -340,6 +718,10 @@
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: inherit;
+}
+
+.painel-modal textarea {
+  resize: none;
 }
 
 .painel-modal-actions {
@@ -354,18 +736,29 @@
   border-radius: 8px;
   font-size: 0.875rem;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, filter 0.15s ease;
 }
 
 .painel-modal-actions button[type='button'] {
   border: 1px solid #d0d5dd;
   background: #fff;
+  color: var(--ink);
+}
+
+.painel-modal-actions button[type='button']:hover:not(:disabled) {
+  background: var(--paper-2);
+  border-color: #b7bec7;
 }
 
 .painel-modal-actions button[type='submit'] {
   border: none;
-  background: #1c6e4a;
+  background: var(--orange-600);
   color: #fff;
   font-weight: 600;
+}
+
+.painel-modal-actions button[type='submit']:hover:not(:disabled) {
+  background: #d9791f;
 }
 
 .painel-modal-actions button:disabled {
@@ -373,10 +766,57 @@
   cursor: not-allowed;
 }
 
+/* Diálogo de confirmação (ConfirmModal): a cor do botão de confirmação
+   acompanha o tipo de ação (destrutiva/positiva/atenção), nunca a mesma cor
+   do "Cancelar", para reduzir o risco de clique errado em ações irreversíveis. */
+.painel-modal-actions .painel-confirm-cancel:hover:not(:disabled) {
+  background: var(--paper-2);
+  border-color: #b7bec7;
+  color: var(--ink);
+}
+
+.painel-modal-actions .painel-confirm-confirm {
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-danger {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-danger:hover:not(:disabled) {
+  background: #fee4e2;
+  border-color: #fda29b;
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-success {
+  background: var(--green-100);
+  border-color: var(--green-100);
+  color: var(--green-600);
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-success:hover:not(:disabled) {
+  background: #c3ddb5;
+  border-color: var(--green-300);
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-warning {
+  background: var(--orange-200);
+  border-color: var(--orange-200);
+  color: #8a4610;
+}
+
+.painel-modal-actions .painel-confirm-confirm.painel-confirm-warning:hover:not(:disabled) {
+  background: #f5ae63;
+  border-color: var(--orange-400);
+}
+
 .painel-empty {
   padding: 1.5rem;
   text-align: center;
-  color: #667085;
+  color: var(--ink-soft);
   font-size: 0.875rem;
 }
 
@@ -404,6 +844,12 @@
 
 .painel-post-form {
   max-width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--green-100);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(48, 76, 56, 0.1), 0 1px 2px rgba(48, 76, 56, 0.06);
+  padding: 1.75rem;
 }
 
 .painel-form-grid {
@@ -413,13 +859,28 @@
   margin-bottom: 1.5rem;
 }
 
+/* Divide o form de post em seções (ex.: campos principais vs. SEO) sem
+   quebrar em sub-formulários separados - só um título entre dois
+   .painel-form-grid. */
+.painel-form-section-title {
+  margin: 0 0 1rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--green-100);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.painel-form-grid .painel-thumb {
+  margin-top: 0.25rem;
+}
+
 .painel-form-grid label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #344054;
+  color: var(--ink-soft);
 }
 
 .painel-form-grid label.painel-checkbox {
@@ -437,6 +898,20 @@
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: inherit;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.painel-form-grid textarea {
+  resize: none;
+}
+
+.painel-form-grid input:focus,
+.painel-form-grid select:focus,
+.painel-form-grid textarea:focus {
+  outline: none;
+  border-color: var(--orange-600);
+  box-shadow: 0 0 0 3px rgba(240, 142, 53, 0.18);
 }
 
 .painel-editor-label {
@@ -445,14 +920,14 @@
   gap: 0.4rem;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #344054;
+  color: var(--ink-soft);
   margin-bottom: 1.25rem;
 }
 
 .painel-form-warning {
-  background: #fffaeb;
-  border: 1px solid #fedf89;
-  color: #b54708;
+  background: rgba(249, 198, 59, 0.14);
+  border: 1px solid var(--gold);
+  color: var(--ink);
   padding: 0.6rem 0.85rem;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -480,7 +955,7 @@
 
 .painel-form-actions button[type='submit'] {
   border: none;
-  background: #1c6e4a;
+  background: var(--orange-600);
   color: #fff;
   font-weight: 600;
 }
@@ -490,12 +965,207 @@
   cursor: not-allowed;
 }
 
+/* Página de detalhe somente leitura (ex.: visualizar autor) */
+
+.painel-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.painel-detail-field p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.painel-detail-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+/* Perfil de autor (estilo rede social) */
+
+.painel-autor-profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+}
+
+.painel-autor-profile-photo {
+  flex-shrink: 0;
+  width: 160px;
+}
+
+.painel-thumb-xl {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+}
+
+.painel-autor-profile-avatar-fallback {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-100);
+  color: var(--green-700, var(--forest));
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.painel-autor-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.painel-autor-profile-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.painel-autor-profile-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.painel-autor-profile-handle {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.painel-autor-profile-subtitle {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.painel-autor-profile-social {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.painel-autor-profile-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.painel-autor-profile-social a svg {
+  width: 18px;
+  height: 18px;
+}
+
+.painel-autor-profile-social a:hover {
+  background: var(--orange-200);
+  color: #8a4610;
+}
+
+.painel-autor-profile-bio {
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.painel-thumb-lg {
+  width: 120px;
+  height: 120px;
+}
+
+/* Perfil de categoria (reaproveita a tipografia do perfil de autor acima,
+   sem foto/ícone - categorias não têm imagem própria). */
+
+.painel-categoria-profile-stat {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Campo de imagem com arrastar-e-soltar (capa de postagem) */
+
+.painel-image-drop {
+  border: 2px dashed #d0d5dd;
+  border-radius: 10px;
+  background: var(--paper-2);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--painel-image-input-height);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+/* Usado no textarea que fica ao lado de um ImageDropInput no mesmo grid
+   (ex.: Resumo/Descrição ao lado de Imagem de capa) - mantém a mesma altura
+   base da caixa de imagem (.painel-image-drop) em vez de depender de `rows`. */
+.painel-textarea-match-image {
+  height: var(--painel-image-input-height);
+}
+
+.painel-image-drop.is-dragover {
+  border-color: var(--orange-600);
+  background: rgba(240, 142, 53, 0.08);
+}
+
+.painel-image-drop-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.painel-image-drop-placeholder svg {
+  width: 28px;
+  height: 28px;
+}
+
+.painel-image-drop.has-image {
+  padding: 0;
+  border-style: solid;
+  border-color: var(--green-100);
+}
+
+.painel-image-drop-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
 /* Galeria - upload em lote e grade de fotos reordenável */
 
 .painel-gallery-fotos {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #eaecf0;
+  border-top: 1px solid var(--green-100);
 }
 
 .painel-gallery-fotos h2 {
@@ -510,69 +1180,334 @@
   gap: 0.4rem;
 }
 
-.painel-gallery-uploader > button {
-  border: none;
-  background: #1c6e4a;
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.painel-gallery-uploader > button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .painel-upload-result {
   font-size: 0.8rem;
-  color: #475467;
+  color: var(--ink-soft);
   text-align: right;
 }
 
 .painel-photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 880px) {
+  .painel-photo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .painel-photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .painel-photo-item {
+  position: relative;
+  z-index: 0;
   background: #fff;
-  border: 1px solid #eaecf0;
+  border: 1px solid var(--green-100);
   border-radius: 10px;
   padding: 0.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
   cursor: grab;
   touch-action: none;
 }
 
+.painel-photo-item--menu-aberto {
+  z-index: 5;
+}
+
+.painel-photo-thumb {
+  position: relative;
+}
+
 .painel-photo-item img {
+  display: block;
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 6px;
-  background: #f2f4f7;
+  background: var(--paper-2);
 }
 
-.painel-photo-item input {
-  padding: 0.35rem 0.5rem;
-  border: 1px solid #d0d5dd;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  cursor: text;
+.painel-photo-menu-wrap {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
 }
 
-.painel-photo-item button {
-  align-self: flex-start;
-  border: 1px solid #fecdca;
-  color: #b42318;
-  background: #fff;
-  border-radius: 6px;
-  padding: 0.25rem 0.6rem;
-  font-size: 0.75rem;
+.painel-photo-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
   cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.painel-photo-menu-trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.painel-photo-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 0.3rem;
+  z-index: 10;
+}
+
+.painel-photo-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.painel-photo-menu button:hover {
+  background: var(--paper-2);
+}
+
+.painel-photo-menu button.destrutivo {
+  color: #b42318;
+}
+
+.painel-photo-menu button.destrutivo:hover {
+  background: #fef3f2;
+}
+
+.painel-photo-menu button svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Responsivo - tablets e celulares: sidebar vira um drawer off-canvas
+   acionado pelo botão hamburguer da topbar, em vez de coluna fixa. */
+@media (max-width: 880px) {
+  .painel-sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .painel-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: min(260px, 80vw);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 2px 0 16px rgba(48, 76, 56, 0.25);
+  }
+
+  .painel-shell.sidebar-open .painel-sidebar {
+    transform: translateX(0);
+  }
+
+  .painel-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    border: 0;
+    padding: 0;
+    background: rgba(48, 76, 56, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .painel-shell.sidebar-open .painel-sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .painel-topbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .painel-content {
+    padding: 1rem;
+  }
+
+  .painel-form-grid,
+  .painel-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .painel-autor-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .painel-autor-profile-header {
+    justify-content: center;
+  }
+
+  .painel-autor-profile-social {
+    justify-content: center;
+  }
+
+  .painel-autor-profile-bio {
+    max-width: none;
+  }
+
+  .painel-modal-wide {
+    max-width: 480px;
+  }
+
+  .painel-post-form {
+    padding: 1.25rem;
+  }
+
+  /* Tabelas -> cartões empilhados (sem rolagem horizontal) */
+  .painel-table thead {
+    display: none;
+  }
+
+  .painel-table,
+  .painel-table tbody,
+  .painel-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .painel-table {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .painel-table tbody tr {
+    background: #fff;
+    border: 1px solid var(--green-100);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(48, 76, 56, 0.06);
+    margin-bottom: 0.9rem;
+    overflow: hidden; /* recorta a miniatura de sangria nos cantos arredondados */
+  }
+
+  .painel-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .painel-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--green-100);
+    text-align: right;
+  }
+
+  .painel-table td:nth-last-child(2) {
+    border-bottom: none; /* linha de campo logo antes das ações */
+  }
+
+  .painel-table td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+  }
+
+  /* Miniatura: imagem de destaque no topo do cartão, não linha rotulada */
+  .painel-table td.painel-table-cell-thumb {
+    display: block;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .painel-table td.painel-table-cell-thumb .painel-thumb {
+    width: 100%;
+    height: 140px;
+    border-radius: 0;
+  }
+
+  /* Ações: alinhadas à direita, separadas por um traço no rodapé do cartão */
+  .painel-table td.painel-table-cell-actions {
+    justify-content: flex-end;
+    padding: 0.6rem 0.9rem;
+    border-bottom: none;
+    border-top: 1px solid var(--green-100);
+  }
+
+  /* Linha de "nenhum resultado": sem moldura de cartão */
+  .painel-table tbody tr:has(.painel-empty) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .painel-table tbody tr:has(.painel-empty) td {
+    display: block;
+    padding: 0;
+    border-bottom: none;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .painel-crud-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .painel-crud-header h1 {
+    font-size: 1.15rem;
+  }
+
+  .painel-crud-header-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .painel-crud-header-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .painel-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .painel-topbar-user {
+    display: none;
+  }
+
+  .painel-gallery-uploader {
+    align-items: stretch;
+  }
+
+  .painel-gallery-uploader > button {
+    width: 100%;
+  }
 }
