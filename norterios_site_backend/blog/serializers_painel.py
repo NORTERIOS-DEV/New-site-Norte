@@ -1,8 +1,11 @@
 import json
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Autor, Categoria, Post
+from .validators import contem_imagem_sem_alt, validate_tiptap_document
 
 
 class FlexibleJSONField(serializers.JSONField):
@@ -24,7 +27,10 @@ class FlexibleJSONField(serializers.JSONField):
 class AutorPainelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Autor
-        fields = ['id', 'nome', 'foto', 'mini_bio', 'cargo', 'ativo']
+        fields = [
+            'id', 'nome', 'nome_exibicao', 'foto', 'mini_bio', 'cargo',
+            'formacao_especialidade', 'instagram', 'linkedin', 'ativo',
+        ]
 
 
 class CategoriaPainelSerializer(serializers.ModelSerializer):
@@ -52,7 +58,12 @@ class PostPainelSerializer(serializers.ModelSerializer):
         queryset=Categoria.objects.filter(ativo=True), allow_null=True, required=False,
     )
     categoria_nome = serializers.SerializerMethodField()
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    # "agendado" não existe em Post.STATUS_CHOICES (ver models.py) - é
+    # traduzido para `publicado` em validate() e o estado é recuperado via
+    # `status_efetivo` (derivado de status + data_publicacao futura).
+    status = serializers.ChoiceField(choices=list(Post.STATUS_LABELS.items()))
+    status_display = serializers.SerializerMethodField()
+    status_efetivo = serializers.CharField(read_only=True)
     conteudo_json = FlexibleJSONField(required=False, allow_null=True)
 
     class Meta:
@@ -60,8 +71,9 @@ class PostPainelSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'titulo', 'slug', 'resumo', 'conteudo', 'conteudo_json',
             'imagem_capa', 'autor', 'autor_nome', 'categoria', 'categoria_nome',
-            'destaque', 'status', 'status_display', 'tempo_leitura_minutos',
+            'destaque', 'status', 'status_display', 'status_efetivo', 'tempo_leitura_minutos',
             'data_criacao', 'data_atualizacao', 'data_publicacao',
+            'meta_title', 'meta_description', 'og_image',
         ]
         # `conteudo` (HTML legado) é só leitura no painel - serve apenas para o
         # frontend detectar posts antigos que ainda não passaram pelo editor
@@ -72,6 +84,9 @@ class PostPainelSerializer(serializers.ModelSerializer):
     def get_categoria_nome(self, obj):
         return obj.categoria.nome if obj.categoria_id else None
 
+    def get_status_display(self, obj):
+        return Post.STATUS_LABELS.get(obj.status_efetivo, obj.status_efetivo)
+
     def validate_slug(self, value):
         if value:
             qs = Post.objects.filter(slug=value)
@@ -80,3 +95,35 @@ class PostPainelSerializer(serializers.ModelSerializer):
             if qs.exists():
                 raise serializers.ValidationError('Já existe uma postagem com este slug.')
         return value
+
+    def validate_conteudo_json(self, value):
+        try:
+            validate_tiptap_document(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.message)
+        return value
+
+    def validate(self, attrs):
+        status_in = attrs.get('status')
+
+        if status_in == Post.STATUS_AGENDADO:
+            data_pub = attrs.get('data_publicacao', getattr(self.instance, 'data_publicacao', None))
+            if not data_pub or data_pub <= timezone.now():
+                raise serializers.ValidationError(
+                    {'data_publicacao': ['Informe uma data futura para agendar a publicação.']},
+                )
+            attrs['status'] = Post.STATUS_PUBLICADO
+            status_in = Post.STATUS_PUBLICADO
+
+        if status_in == Post.STATUS_PUBLICADO:
+            imagem = attrs.get('imagem_capa', getattr(self.instance, 'imagem_capa', None))
+            if not imagem:
+                raise serializers.ValidationError({'imagem_capa': ['Obrigatória para publicar.']})
+
+            conteudo = attrs.get('conteudo_json', getattr(self.instance, 'conteudo_json', None))
+            if contem_imagem_sem_alt(conteudo):
+                raise serializers.ValidationError(
+                    {'conteudo_json': ['Todas as imagens do conteúdo precisam de texto alternativo antes de publicar.']},
+                )
+
+        return attrs

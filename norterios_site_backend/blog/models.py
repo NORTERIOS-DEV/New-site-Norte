@@ -1,6 +1,9 @@
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
 from django.utils.text import slugify
+
+from uploads.validators import validate_image_extension, validate_image_size
 
 from .utils import estimate_reading_time
 
@@ -36,9 +39,18 @@ class Categoria(models.Model):
 
 class Autor(models.Model):
     nome = models.CharField(max_length=150)
+    nome_exibicao = models.CharField(
+        'Nome de exibição',
+        max_length=150,
+        blank=True,
+        help_text='Nome público exibido nos posts do site. Se vazio, usa o campo Nome.',
+    )
     foto = models.ImageField(upload_to='blog/autores/%Y/%m/', blank=True, null=True)
     mini_bio = models.TextField('Mini biografia', blank=True)
     cargo = models.CharField(max_length=120, blank=True)
+    formacao_especialidade = models.CharField('Formação / especialidade', max_length=150, blank=True)
+    instagram = models.URLField('Instagram', blank=True)
+    linkedin = models.URLField('LinkedIn', blank=True)
     ativo = models.BooleanField(default=True)
 
     class Meta:
@@ -47,14 +59,24 @@ class Autor(models.Model):
     def __str__(self):
         return self.nome
 
+    @property
+    def nome_publico(self):
+        """Nome usado como autoria visível no site público: nome_exibicao,
+        com fallback para nome quando vazio."""
+        return self.nome_exibicao or self.nome
+
 
 class Post(models.Model):
     STATUS_RASCUNHO = 'rascunho'
     STATUS_PUBLICADO = 'publicado'
+    STATUS_AGENDADO = 'agendado'
     STATUS_CHOICES = [
         (STATUS_RASCUNHO, 'Rascunho'),
         (STATUS_PUBLICADO, 'Publicado'),
     ]
+    # "agendado" não é um valor persistido em `status` (ver `status_efetivo`) -
+    # existe aqui só para alimentar os rótulos exibidos no painel.
+    STATUS_LABELS = dict(STATUS_CHOICES) | {STATUS_AGENDADO: 'Agendado'}
 
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
@@ -68,7 +90,12 @@ class Post(models.Model):
         blank=True,
         help_text='Conteúdo estruturado do editor TipTap (fonte da verdade para posts novos/editados no painel).',
     )
-    imagem_capa = models.ImageField(upload_to='blog/capas/%Y/%m/', blank=True, null=True)
+    imagem_capa = models.ImageField(
+        upload_to='blog/capas/%Y/%m/',
+        blank=True,
+        null=True,
+        validators=[validate_image_extension, validate_image_size],
+    )
     autor = models.ForeignKey(
         Autor,
         on_delete=models.PROTECT,
@@ -94,12 +121,52 @@ class Post(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     data_publicacao = models.DateTimeField(null=True, blank=True)
+    meta_title = models.CharField(
+        'Meta title (SEO)', max_length=70, blank=True,
+        help_text='Se vazio, usa o título do post.',
+    )
+    meta_description = models.CharField(
+        'Meta description (SEO)', max_length=160, blank=True,
+        help_text='Se vazio, usa o resumo do post.',
+    )
+    og_image = models.ImageField(
+        'Imagem para compartilhamento (Open Graph)',
+        upload_to='blog/og/%Y/%m/',
+        blank=True,
+        null=True,
+        validators=[validate_image_extension, validate_image_size],
+        help_text='Se vazia, usa a imagem de capa.',
+    )
 
     class Meta:
         ordering = ['-data_publicacao', '-data_criacao']
+        constraints = [
+            UniqueConstraint(fields=['destaque'], condition=Q(destaque=True), name='post_unico_destaque'),
+        ]
 
     def __str__(self):
         return self.titulo
+
+    @property
+    def status_efetivo(self):
+        """Estado exibido ao usuário: "agendado" é derivado (status=publicado
+        com data_publicacao futura), nunca persistido no banco - ver
+        PostPainelSerializer.validate()."""
+        if self.status == self.STATUS_PUBLICADO and self.data_publicacao and self.data_publicacao > timezone.now():
+            return self.STATUS_AGENDADO
+        return self.status
+
+    @property
+    def meta_title_efetivo(self):
+        return self.meta_title or self.titulo
+
+    @property
+    def meta_description_efetivo(self):
+        return self.meta_description or self.resumo
+
+    @property
+    def og_image_efetivo(self):
+        return self.og_image or self.imagem_capa
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -108,4 +175,10 @@ class Post(models.Model):
             self.data_publicacao = timezone.now()
         if not self.tempo_leitura_minutos and self.conteudo_json:
             self.tempo_leitura_minutos = estimate_reading_time(self.conteudo_json)
-        super().save(*args, **kwargs)
+
+        if self.destaque:
+            with transaction.atomic():
+                Post.objects.filter(destaque=True).exclude(pk=self.pk).update(destaque=False)
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)

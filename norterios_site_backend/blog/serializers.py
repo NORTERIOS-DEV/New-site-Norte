@@ -21,9 +21,29 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
     def get_autor_nome(self, obj):
-        return obj.autor.nome
+        return obj.autor.nome_publico
 
 
 class PostDetailSerializer(PostListSerializer):
+    meta_title = serializers.SerializerMethodField()
+    meta_description = serializers.SerializerMethodField()
+    og_image = serializers.SerializerMethodField()
+
     class Meta(PostListSerializer.Meta):
-        fields = PostListSerializer.Meta.fields + ['conteudo', 'conteudo_json']
+        fields = PostListSerializer.Meta.fields + [
+            'conteudo', 'conteudo_json', 'meta_title', 'meta_description', 'og_image',
+        ]
+
+    def get_meta_title(self, obj):
+        return obj.meta_title_efetivo
+
+    def get_meta_description(self, obj):
+        return obj.meta_description_efetivo
+
+    def get_og_image(self, obj):
+        imagem = obj.og_image_efetivo
+        if not imagem:
+            return None
+        request = self.context.get('request')
+        url = imagem.url
+        return request.build_absolute_uri(url) if request else url

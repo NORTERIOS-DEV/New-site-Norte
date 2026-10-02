@@ -1,5 +1,8 @@
+from django.db import IntegrityError
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.viewsets import PainelModelViewSet
@@ -18,6 +21,18 @@ ORDENACOES_PERMITIDAS = {
 class PostPainelViewSet(PainelModelViewSet):
     serializer_class = PostPainelSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            raise ValidationError({'slug': ['Já existe uma postagem com este slug.']})
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except IntegrityError:
+            raise ValidationError({'slug': ['Já existe uma postagem com este slug.']})
+
     def get_queryset(self):
         queryset = Post.objects.select_related('autor', 'categoria').all()
         params = self.request.query_params
@@ -35,7 +50,11 @@ class PostPainelViewSet(PainelModelViewSet):
             queryset = queryset.filter(autor_id=autor)
 
         status_param = params.get('status')
-        if status_param:
+        if status_param == Post.STATUS_AGENDADO:
+            queryset = queryset.filter(status=Post.STATUS_PUBLICADO, data_publicacao__gt=timezone.now())
+        elif status_param == Post.STATUS_PUBLICADO:
+            queryset = queryset.filter(status=Post.STATUS_PUBLICADO).exclude(data_publicacao__gt=timezone.now())
+        elif status_param:
             queryset = queryset.filter(status=status_param)
 
         data_de = params.get('data_de')
@@ -54,16 +73,18 @@ class PostPainelViewSet(PainelModelViewSet):
     @action(detail=True, methods=['post'])
     def publicar(self, request, pk=None):
         post = self.get_object()
-        post.status = Post.STATUS_PUBLICADO
-        post.save()
-        return Response(self.get_serializer(post).data)
+        serializer = self.get_serializer(post, data={'status': Post.STATUS_PUBLICADO}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def despublicar(self, request, pk=None):
         post = self.get_object()
-        post.status = Post.STATUS_RASCUNHO
-        post.save()
-        return Response(self.get_serializer(post).data)
+        serializer = self.get_serializer(post, data={'status': Post.STATUS_RASCUNHO}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class CategoriaPainelViewSet(PainelModelViewSet):
