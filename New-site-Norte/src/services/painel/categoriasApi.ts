@@ -12,6 +12,10 @@ export function listCategorias(): Promise<Categoria[]> {
   return painelFetchJson('/categorias/')
 }
 
+export function getCategoria(id: number): Promise<Categoria> {
+  return painelFetchJson(`/categorias/${id}/`)
+}
+
 export function createCategoria(data: CategoriaInput): Promise<Categoria> {
   return painelFetchJson('/categorias/', { method: 'POST', body: data })
 }

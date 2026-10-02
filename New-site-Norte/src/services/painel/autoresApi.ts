@@ -5,6 +5,10 @@ export function listAutores(): Promise<Autor[]> {
   return painelFetchJson('/autores/')
 }
 
+export function getAutor(id: number): Promise<Autor> {
+  return painelFetchJson(`/autores/${id}/`)
+}
+
 /** Sempre FormData: Autor tem upload de foto (ImageField), então o create/edit
  * precisa de multipart mesmo quando nenhum arquivo novo é enviado. */
 export function createAutor(data: FormData): Promise<Autor> {
