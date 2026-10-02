@@ -61,8 +61,17 @@ export const router = createBrowserRouter([
               import('./pages/painel/CategoriasListPage').then((m) => ({ Component: m.CategoriasListPage })),
           },
           {
+            path: 'categorias/:id',
+            lazy: () =>
+              import('./pages/painel/CategoriaDetailPage').then((m) => ({ Component: m.CategoriaDetailPage })),
+          },
+          {
             path: 'autores',
             lazy: () => import('./pages/painel/AutoresListPage').then((m) => ({ Component: m.AutoresListPage })),
+          },
+          {
+            path: 'autores/:id',
+            lazy: () => import('./pages/painel/AutorDetailPage').then((m) => ({ Component: m.AutorDetailPage })),
           },
           {
             path: 'galeria',

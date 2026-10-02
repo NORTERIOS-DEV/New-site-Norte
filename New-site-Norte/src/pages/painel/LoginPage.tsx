@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Navigate, useLocation, useNavigate, type Location } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { LogoWordmark } from '../../components/LogoWordmark'
 import '../../styles/painel.css'
 
 type LoginFormValues = {
@@ -39,19 +40,26 @@ export function LoginPage() {
   return (
     <div className="painel-login">
       <form className="painel-login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="painel-login-logo">
+          <LogoWordmark />
+        </div>
         <h1>Painel Norte Rios</h1>
 
-        <label>
-          Usuário
-          <input autoFocus autoComplete="username" {...register('username', { required: true })} />
-        </label>
-        {errors.username && <span className="painel-field-error">Informe o usuário.</span>}
+        <div className="painel-field">
+          <label>
+            Usuário
+            <input autoFocus autoComplete="username" {...register('username', { required: true })} />
+          </label>
+          {errors.username && <span className="painel-field-error">Informe o usuário.</span>}
+        </div>
 
-        <label>
-          Senha
-          <input type="password" autoComplete="current-password" {...register('password', { required: true })} />
-        </label>
-        {errors.password && <span className="painel-field-error">Informe a senha.</span>}
+        <div className="painel-field">
+          <label>
+            Senha
+            <input type="password" autoComplete="current-password" {...register('password', { required: true })} />
+          </label>
+          {errors.password && <span className="painel-field-error">Informe a senha.</span>}
+        </div>
 
         {erro && <p className="painel-form-error">{erro}</p>}
 
