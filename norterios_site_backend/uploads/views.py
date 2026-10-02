@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
@@ -10,8 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from galeria.services import process_new_image
 
-EXTENSOES_PERMITIDAS = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
-TAMANHO_MAXIMO_BYTES = 5 * 1024 * 1024
+from .validators import validate_image_extension, validate_image_size
 
 
 class ImageUploadView(APIView):
@@ -29,11 +29,11 @@ class ImageUploadView(APIView):
             return Response({'detail': "Envie um arquivo no campo 'imagem'."}, status=status.HTTP_400_BAD_REQUEST)
 
         extensao = arquivo.name.rsplit('.', 1)[-1].lower() if '.' in arquivo.name else ''
-        if extensao not in EXTENSOES_PERMITIDAS:
-            return Response({'detail': 'Formato de imagem não suportado.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if arquivo.size > TAMANHO_MAXIMO_BYTES:
-            return Response({'detail': 'Imagem excede o tamanho máximo de 5MB.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            validate_image_extension(arquivo)
+            validate_image_size(arquivo)
+        except ValidationError as exc:
+            return Response({'detail': exc.messages[0]}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             content, _imagem_pil, _largura, _altura = process_new_image(arquivo)
