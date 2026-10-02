@@ -43,12 +43,17 @@ class AlbumPainelViewSet(PainelModelViewSet):
         if not arquivos:
             return Response({'detail': 'Nenhum arquivo enviado.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        legenda = request.data.get('legenda', '')
+        alt = request.data.get('alt', '')
+
         proxima_ordem = (album.fotos.aggregate(Max('ordem'))['ordem__max'] or 0) + 1
         criadas = []
         erros = []
         for indice, arquivo in enumerate(arquivos):
             try:
-                foto = Foto.objects.create(album=album, imagem=arquivo, ordem=proxima_ordem + indice)
+                foto = Foto.objects.create(
+                    album=album, imagem=arquivo, ordem=proxima_ordem + indice, legenda=legenda, alt=alt,
+                )
                 criadas.append(FotoPainelSerializer(foto, context=self.get_serializer_context()).data)
             except Exception as exc:
                 erros.append({'arquivo': arquivo.name, 'erro': str(exc)})
@@ -74,8 +79,8 @@ class AlbumPainelViewSet(PainelModelViewSet):
 
 
 class FotoPainelViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    """Edição pontual (legenda/alt) e exclusão de uma foto avulsa - a criação
-    acontece só via AlbumPainelViewSet.upload_fotos."""
+    """Edição pontual (legenda/alt/imagem) e exclusão de uma foto avulsa - a
+    criação acontece só via AlbumPainelViewSet.upload_fotos."""
 
     queryset = Foto.objects.all()
     serializer_class = FotoPainelSerializer

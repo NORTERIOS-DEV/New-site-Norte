@@ -27,7 +27,7 @@ class FotoPainelSerializer(serializers.ModelSerializer):
             'id', 'album', 'imagem', 'miniatura', 'imagem_media',
             'legenda', 'alt', 'largura', 'altura', 'ordem',
         ]
-        read_only_fields = ['album', 'imagem', 'miniatura', 'imagem_media', 'largura', 'altura']
+        read_only_fields = ['album', 'miniatura', 'imagem_media', 'largura', 'altura']
 
 
 class AlbumPainelSerializer(serializers.ModelSerializer):
