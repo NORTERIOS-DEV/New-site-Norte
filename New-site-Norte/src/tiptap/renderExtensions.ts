@@ -18,6 +18,10 @@ import { VideoEmbed } from './videoEmbedNode'
  */
 export const tiptapRenderExtensions = [
   StarterKit.configure({
+    // Mantém até H4 aqui (extensions.ts só permite criar H1-H3 na toolbar):
+    // posts legados podem ter H4 persistido no conteudo_json, e o render
+    // público precisa continuar reconhecendo esse nível mesmo sem a toolbar
+    // mais oferecer criar um novo.
     heading: { levels: [1, 2, 3, 4] },
     link: { openOnClick: false, autolink: true },
   }),

@@ -1,14 +1,60 @@
 import type { Editor } from '@tiptap/core'
-import { useCallback, useRef, type ChangeEvent } from 'react'
+import { useCallback, useRef, type ChangeEvent, type ReactNode } from 'react'
 import { uploadImagem } from '../../services/painel/uploadsApi'
+import { promptForLink } from '../../tiptap/linkPrompt'
+import {
+  IconAlignCenter,
+  IconAlignLeft,
+  IconAlignRight,
+  IconBold,
+  IconHorizontalRule,
+  IconImage,
+  IconItalic,
+  IconLink,
+  IconListBullet,
+  IconListOrdered,
+  IconMaximize,
+  IconMinimize,
+  IconParagraph,
+  IconQuote,
+  IconRedo,
+  IconTable,
+  IconUnderline,
+  IconUndo,
+  IconVideo,
+} from '../../tiptap/toolbarIcons'
 
 type TipTapToolbarProps = {
   editor: Editor | null
+  maximizado: boolean
+  onAlternarMaximizado: () => void
 }
 
-const HEADING_LEVELS = [1, 2, 3, 4] as const
+const HEADING_LEVELS = [1, 2, 3] as const
 
-export function TipTapToolbar({ editor }: TipTapToolbarProps) {
+type ToolbarButtonProps = {
+  title: string
+  active?: boolean
+  onClick: () => void
+  children: ReactNode
+  className?: string
+}
+
+function ToolbarButton({ title, active, onClick, children, className }: ToolbarButtonProps) {
+  return (
+    <button
+      type="button"
+      data-tooltip={title}
+      className={`${active ? 'is-active' : ''}${className ? ` ${className}` : ''}`}
+      onClick={onClick}
+    >
+      {children}
+      <span className="tiptap-sr-only">{title}</span>
+    </button>
+  )
+}
+
+export function TipTapToolbar({ editor, maximizado, onAlternarMaximizado }: TipTapToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const inserirImagem = useCallback(() => {
@@ -21,7 +67,8 @@ export function TipTapToolbar({ editor }: TipTapToolbarProps) {
     if (!file || !editor) return
     try {
       const url = await uploadImagem(file)
-      editor.chain().focus().setImage({ src: url }).run()
+      const alt = window.prompt('Texto alternativo da imagem (para acessibilidade e SEO):') ?? ''
+      editor.chain().focus().setImage({ src: url, alt }).run()
     } catch {
       window.alert('Não foi possível enviar a imagem.')
     }
@@ -35,142 +82,135 @@ export function TipTapToolbar({ editor }: TipTapToolbarProps) {
     if (!ok) window.alert('Link de vídeo não reconhecido. Use um link do YouTube ou do Vimeo.')
   }
 
-  function inserirLink() {
-    if (!editor) return
-    const anterior = editor.getAttributes('link').href as string | undefined
-    const url = window.prompt('URL do link:', anterior ?? 'https://')
-    if (url === null) return
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
-  }
-
   if (!editor) return null
 
   return (
     <div className="tiptap-toolbar">
       {HEADING_LEVELS.map((nivel) => (
-        <button
+        <ToolbarButton
           key={nivel}
-          type="button"
-          className={editor.isActive('heading', { level: nivel }) ? 'is-active' : ''}
+          title={`Título ${nivel}`}
+          active={editor.isActive('heading', { level: nivel })}
+          className="tiptap-heading-btn"
           onClick={() => editor.chain().focus().toggleHeading({ level: nivel }).run()}
         >
           H{nivel}
-        </button>
+        </ToolbarButton>
       ))}
-      <button
-        type="button"
-        className={editor.isActive('paragraph') ? 'is-active' : ''}
+      <ToolbarButton
+        title="Parágrafo"
+        active={editor.isActive('paragraph')}
         onClick={() => editor.chain().focus().setParagraph().run()}
       >
-        Texto
-      </button>
+        <IconParagraph />
+      </ToolbarButton>
 
       <span className="tiptap-separator" />
 
-      <button
-        type="button"
-        className={editor.isActive('bold') ? 'is-active' : ''}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-      >
-        Negrito
-      </button>
-      <button
-        type="button"
-        className={editor.isActive('italic') ? 'is-active' : ''}
+      <ToolbarButton title="Negrito" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <IconBold />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Itálico"
+        active={editor.isActive('italic')}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
-        Itálico
-      </button>
-      <button
-        type="button"
-        className={editor.isActive('underline') ? 'is-active' : ''}
+        <IconItalic />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Sublinhado"
+        active={editor.isActive('underline')}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
       >
-        Sublinhado
-      </button>
-      <button type="button" className={editor.isActive('link') ? 'is-active' : ''} onClick={inserirLink}>
-        Link
-      </button>
+        <IconUnderline />
+      </ToolbarButton>
+      <ToolbarButton title="Link" active={editor.isActive('link')} onClick={() => promptForLink(editor)}>
+        <IconLink />
+      </ToolbarButton>
 
       <span className="tiptap-separator" />
 
-      <button
-        type="button"
-        className={editor.isActive('bulletList') ? 'is-active' : ''}
+      <ToolbarButton
+        title="Lista"
+        active={editor.isActive('bulletList')}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
-        Lista
-      </button>
-      <button
-        type="button"
-        className={editor.isActive('orderedList') ? 'is-active' : ''}
+        <IconListBullet />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Lista numerada"
+        active={editor.isActive('orderedList')}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
-        Lista numerada
-      </button>
-      <button
-        type="button"
-        className={editor.isActive('blockquote') ? 'is-active' : ''}
+        <IconListOrdered />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Citação"
+        active={editor.isActive('blockquote')}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
       >
-        Citação
-      </button>
+        <IconQuote />
+      </ToolbarButton>
 
       <span className="tiptap-separator" />
 
-      <button
-        type="button"
-        className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}
+      <ToolbarButton
+        title="Alinhar à esquerda"
+        active={editor.isActive({ textAlign: 'left' })}
         onClick={() => editor.chain().focus().setTextAlign('left').run()}
       >
-        Esq.
-      </button>
-      <button
-        type="button"
-        className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}
+        <IconAlignLeft />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Centralizar"
+        active={editor.isActive({ textAlign: 'center' })}
         onClick={() => editor.chain().focus().setTextAlign('center').run()}
       >
-        Centro
-      </button>
-      <button
-        type="button"
-        className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
+        <IconAlignCenter />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Alinhar à direita"
+        active={editor.isActive({ textAlign: 'right' })}
         onClick={() => editor.chain().focus().setTextAlign('right').run()}
       >
-        Dir.
-      </button>
+        <IconAlignRight />
+      </ToolbarButton>
 
       <span className="tiptap-separator" />
 
-      <button type="button" onClick={inserirImagem}>
-        Imagem
-      </button>
+      <ToolbarButton title="Imagem" onClick={inserirImagem}>
+        <IconImage />
+      </ToolbarButton>
       <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={onArquivoSelecionado} />
-      <button type="button" onClick={inserirVideo}>
-        Vídeo
-      </button>
-      <button
-        type="button"
+      <ToolbarButton title="Vídeo" onClick={inserirVideo}>
+        <IconVideo />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Tabela"
         onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
       >
-        Tabela
-      </button>
-      <button type="button" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-        Separador
-      </button>
+        <IconTable />
+      </ToolbarButton>
+      <ToolbarButton title="Separador" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <IconHorizontalRule />
+      </ToolbarButton>
 
       <span className="tiptap-separator" />
 
-      <button type="button" onClick={() => editor.chain().focus().undo().run()}>
-        Desfazer
-      </button>
-      <button type="button" onClick={() => editor.chain().focus().redo().run()}>
-        Refazer
-      </button>
+      <ToolbarButton title="Desfazer" onClick={() => editor.chain().focus().undo().run()}>
+        <IconUndo />
+      </ToolbarButton>
+      <ToolbarButton title="Refazer" onClick={() => editor.chain().focus().redo().run()}>
+        <IconRedo />
+      </ToolbarButton>
+
+      <ToolbarButton
+        title={maximizado ? 'Restaurar editor' : 'Maximizar editor'}
+        onClick={onAlternarMaximizado}
+        className="tiptap-maximize-btn"
+      >
+        {maximizado ? <IconMinimize /> : <IconMaximize />}
+      </ToolbarButton>
     </div>
   )
 }

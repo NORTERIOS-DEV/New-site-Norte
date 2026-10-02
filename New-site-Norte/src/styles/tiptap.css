@@ -16,13 +16,32 @@
 }
 
 .tiptap-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: 1px solid transparent;
   background: transparent;
   border-radius: 6px;
-  padding: 0.35rem 0.55rem;
-  font-size: 0.8rem;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
   color: #344054;
+  flex-shrink: 0;
+}
+
+.tiptap-toolbar button svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Botões de título (H1-H4) mostram texto em vez de ícone - mais claro que
+   um pictograma inventado para "nível de título". */
+.tiptap-toolbar button.tiptap-heading-btn {
+  width: auto;
+  padding: 0 0.5rem;
 }
 
 .tiptap-toolbar button:hover {
@@ -35,6 +54,12 @@
   border-color: #a6f4c5;
 }
 
+/* Empurra o botão de maximizar pro fim da barra, mesmo quando os grupos
+   anteriores quebram linha (flex-wrap). */
+.tiptap-toolbar button.tiptap-maximize-btn {
+  margin-left: auto;
+}
+
 .tiptap-separator {
   width: 1px;
   align-self: stretch;
@@ -42,9 +67,144 @@
   margin: 0 0.25rem;
 }
 
+/* Texto acessível para leitores de tela nos botões só-de-ícone (mesma ideia
+   de `.painel-sr-only`, duplicado aqui pra este módulo não depender da
+   ordem de import de painel.css). */
+.tiptap-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Tooltip customizado para os botões da toolbar: substitui o `title` nativo
+   (balão desenhado pelo SO, não estilizável) por um balão em CSS próprio,
+   com sombra só externa. */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.4rem);
+  transform: translate(-50%, 4px);
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 60;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
 .tiptap-content {
   padding: 1rem 1.1rem;
   min-height: 320px;
+}
+
+/* Menu flutuante exibido ao selecionar texto (@tiptap/react/menus BubbleMenu) -
+   mesma paleta/botões da toolbar fixa, em miniatura. */
+.tiptap-bubble-menu {
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.25rem;
+  background: #1f2937;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+}
+
+.tiptap-bubble-menu button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  color: #f2f4f7;
+}
+
+.tiptap-bubble-menu button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tiptap-bubble-menu button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tiptap-bubble-menu button.is-active {
+  background: #1c6e4a;
+  color: #fff;
+}
+
+/* Telas pequenas: botões um pouco menores (cabem mais por linha no
+   flex-wrap já existente) e o bubble menu nunca estoura a largura da
+   viewport, mesmo perto da borda. */
+@media (max-width: 600px) {
+  .tiptap-toolbar button {
+    width: 29px;
+    height: 29px;
+  }
+
+  .tiptap-bubble-menu {
+    max-width: calc(100vw - 2rem);
+    flex-wrap: wrap;
+  }
+}
+
+/* Editor maximizado: ocupa a tela inteira, com o header (toolbar) fixo no
+   topo e só o conteúdo rolando - por isso o layout vira flex-column com a
+   toolbar flex-shrink:0 e o conteúdo com overflow-y próprio, em vez de
+   `position: sticky` (mais simples e sem os detalhes finos de sticky dentro
+   de containers com scroll). */
+.tiptap-editor--maximizado {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  border: 0;
+}
+
+.tiptap-editor--maximizado .tiptap-toolbar {
+  flex-shrink: 0;
+}
+
+.tiptap-editor--maximizado .tiptap-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.5rem clamp(1rem, 5vw, 4rem) 3rem;
+}
+
+body.tiptap-scroll-lock {
+  overflow: hidden;
 }
 
 .tiptap-content .ProseMirror {

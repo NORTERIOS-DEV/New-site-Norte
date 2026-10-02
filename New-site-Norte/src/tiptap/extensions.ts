@@ -2,6 +2,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import Placeholder from '@tiptap/extension-placeholder'
+import CharacterCount from '@tiptap/extension-character-count'
 import { Table } from '@tiptap/extension-table'
 import TableRow from '@tiptap/extension-table-row'
 import TableHeader from '@tiptap/extension-table-header'
@@ -18,15 +19,18 @@ import { VideoEmbedEditor } from './videoEmbedNodeEditor'
  * heading, horizontalRule (separador) e hardBreak (quebra de linha) - não
  * precisa registrar essas extensões separadamente (duplicar o nome quebra
  * em runtime).
+ *
+ * Heading disponível em H1/H2/H3 (H4 fica de fora, sem pedido pra isso).
  */
 export const tiptapExtensions = [
   StarterKit.configure({
-    heading: { levels: [1, 2, 3, 4] },
+    heading: { levels: [1, 2, 3] },
     link: { openOnClick: false, autolink: true },
   }),
   Image,
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
   Placeholder.configure({ placeholder: 'Escreva o conteúdo da postagem…' }),
+  CharacterCount,
   Table.configure({ resizable: true }),
   TableRow,
   TableHeader,
