@@ -3,9 +3,13 @@ import type { JSONContent } from '@tiptap/core'
 export type Autor = {
   id: number
   nome: string
+  nome_exibicao: string
   foto: string | null
   mini_bio: string
   cargo: string
+  formacao_especialidade: string
+  instagram: string
+  linkedin: string
   ativo: boolean
 }
 
@@ -67,8 +71,15 @@ export type Post = {
   destaque: boolean
   status: string
   status_display: string
+  /** Estado derivado para exibição: "agendado" quando status=publicado com
+   * data_publicacao futura - nunca persistido como valor de `status` (ver
+   * blog/models.py Post.status_efetivo). */
+  status_efetivo: string
   tempo_leitura_minutos: number | null
   data_criacao: string
   data_atualizacao: string
   data_publicacao: string | null
+  meta_title: string
+  meta_description: string
+  og_image: string | null
 }

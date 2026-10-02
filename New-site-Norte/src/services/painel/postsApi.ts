@@ -43,9 +43,17 @@ export type PostInput = {
   status: string
   data_publicacao?: string | null
   tempo_leitura_minutos?: number | null
+  meta_title?: string
+  meta_description?: string
 }
 
-function buildFormData(data: PostInput, imagemCapa?: File | null): FormData {
+export type PostArquivos = {
+  imagemCapa?: File | null
+  ogImage?: File | null
+}
+
+function buildFormData(data: PostInput, arquivos?: PostArquivos, opcoes?: { incluirStatus?: boolean }): FormData {
+  const incluirStatus = opcoes?.incluirStatus ?? true
   const fd = new FormData()
   fd.append('titulo', data.titulo)
   if (data.slug) fd.append('slug', data.slug)
@@ -54,19 +62,35 @@ function buildFormData(data: PostInput, imagemCapa?: File | null): FormData {
   fd.append('autor', String(data.autor))
   if (data.categoria) fd.append('categoria', String(data.categoria))
   fd.append('destaque', String(Boolean(data.destaque)))
-  fd.append('status', data.status)
-  if (data.data_publicacao) fd.append('data_publicacao', data.data_publicacao)
+  if (incluirStatus) {
+    fd.append('status', data.status)
+    if (data.data_publicacao) fd.append('data_publicacao', data.data_publicacao)
+  }
   if (data.tempo_leitura_minutos) fd.append('tempo_leitura_minutos', String(data.tempo_leitura_minutos))
-  if (imagemCapa) fd.append('imagem_capa', imagemCapa)
+  if (data.meta_title !== undefined) fd.append('meta_title', data.meta_title)
+  if (data.meta_description !== undefined) fd.append('meta_description', data.meta_description)
+  if (arquivos?.imagemCapa) fd.append('imagem_capa', arquivos.imagemCapa)
+  if (arquivos?.ogImage) fd.append('og_image', arquivos.ogImage)
   return fd
 }
 
-export function createPost(data: PostInput, imagemCapa?: File | null): Promise<Post> {
-  return painelFetchJson('/posts/', { method: 'POST', body: buildFormData(data, imagemCapa) })
+export function createPost(data: PostInput, arquivos?: PostArquivos): Promise<Post> {
+  return painelFetchJson('/posts/', { method: 'POST', body: buildFormData(data, arquivos) })
 }
 
-export function updatePost(id: number, data: PostInput, imagemCapa?: File | null): Promise<Post> {
-  return painelFetchJson(`/posts/${id}/`, { method: 'PATCH', body: buildFormData(data, imagemCapa) })
+export function updatePost(id: number, data: PostInput, arquivos?: PostArquivos): Promise<Post> {
+  return painelFetchJson(`/posts/${id}/`, { method: 'PATCH', body: buildFormData(data, arquivos) })
+}
+
+/** PATCH de autosave: nunca inclui `status`/`data_publicacao` - garante que
+ * editar o conteúdo de um post já publicado não dispara a validação de
+ * publish-readiness do backend a cada autosave (só o form completo ou os
+ * botões Publicar/Despublicar devem acionar essa checagem). */
+export function autosavePost(id: number, data: PostInput, arquivos?: PostArquivos): Promise<Post> {
+  return painelFetchJson(`/posts/${id}/`, {
+    method: 'PATCH',
+    body: buildFormData(data, arquivos, { incluirStatus: false }),
+  })
 }
 
 export function deletePost(id: number): Promise<void> {

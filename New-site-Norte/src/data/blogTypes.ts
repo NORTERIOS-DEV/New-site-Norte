@@ -24,6 +24,11 @@ export type PostDetail = PostListItem & {
    * TipTap; SafeContent usa conteudo_json quando presente e cai pra isso. */
   conteudo: string
   conteudo_json: JSONContent | null
+  /** Já resolvidos com fallback pelo backend (título/resumo/capa quando
+   * vazios no painel) - ver blog/serializers.py PostDetailSerializer. */
+  meta_title: string
+  meta_description: string
+  og_image: string | null
 }
 
 export type Paginated<T> = {
