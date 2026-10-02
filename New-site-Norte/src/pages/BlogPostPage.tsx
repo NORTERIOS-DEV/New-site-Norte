@@ -106,7 +106,13 @@ export function BlogPostPage() {
 
   return (
     <>
-      <Seo title={`${post.titulo} · Blog Edu Norte · Norte Rios`} description={post.resumo} />
+      <Seo
+        title={`${post.titulo} · Blog Edu Norte · Norte Rios`}
+        description={post.resumo}
+        ogTitle={post.meta_title}
+        ogDescription={post.meta_description}
+        ogImage={post.og_image}
+      />
 
       <section className="sec post-detail-sec" aria-label={post.titulo}>
         <div className="wrap">
