@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
 import { GalleryUploader } from '../../components/painel/GalleryUploader'
+import { ImageDropInput } from '../../components/painel/ImageDropInput'
 import { SortablePhotoGrid } from '../../components/painel/SortablePhotoGrid'
 import {
   createAlbum,
@@ -12,6 +14,8 @@ import {
   type AlbumInput,
 } from '../../services/painel/galeriaApi'
 import { PainelApiError } from '../../services/painel/httpClient'
+import { IconArrowLeft, IconGallery } from '../../components/painel/icons'
+import { PainelPageHeader } from '../../components/painel/PainelPageHeader'
 import '../../styles/painel.css'
 
 type FormValues = {
@@ -85,6 +89,7 @@ export function AlbumFormPage() {
     },
     onSuccess: (novoAlbum) => {
       queryClient.invalidateQueries({ queryKey: ['painel', 'albuns'] })
+      toast.success(isEdicao ? 'Álbum atualizado com sucesso!' : 'Álbum criado com sucesso!')
       if (!isEdicao) {
         navigate(`/painel/galeria/${novoAlbum.id}`, { replace: true })
       }
@@ -103,6 +108,7 @@ export function AlbumFormPage() {
       } else {
         setErroGeral('Não foi possível salvar o álbum.')
       }
+      toast.error('Não foi possível salvar o álbum.')
     },
   })
 
@@ -110,34 +116,45 @@ export function AlbumFormPage() {
 
   return (
     <div>
-      <div className="painel-crud-header">
-        <h1>{isEdicao ? 'Editar álbum' : 'Novo álbum'}</h1>
-      </div>
+      <PainelPageHeader
+        icon={<IconGallery />}
+        title={isEdicao ? 'Editar álbum' : 'Novo álbum'}
+        description="Defina as informações do álbum e organize as fotos enviadas."
+        actions={
+          <button type="button" className="painel-back-button" onClick={() => navigate('/painel/galeria')}>
+            <IconArrowLeft />
+            Voltar
+          </button>
+        }
+      />
 
       <form className="painel-post-form" onSubmit={handleSubmit((data) => salvar.mutate(data))} noValidate>
         <div className="painel-form-grid">
-          <label>
-            Título
-            <input autoFocus {...register('titulo', { required: true })} />
-          </label>
-          {errors.titulo && <span className="painel-field-error">Informe o título.</span>}
+          <div className="painel-field">
+            <label>
+              Título
+              <input autoFocus {...register('titulo', { required: true })} />
+            </label>
+            {errors.titulo && <span className="painel-field-error">Informe o título.</span>}
+          </div>
 
-          <label>
-            Slug (opcional)
-            <input {...register('slug')} />
-          </label>
-          {errors.slug && <span className="painel-field-error">{errors.slug.message}</span>}
+          <div className="painel-field">
+            <label>
+              Slug (opcional)
+              <input {...register('slug')} />
+            </label>
+            {errors.slug && <span className="painel-field-error">{errors.slug.message}</span>}
+          </div>
 
           <label>
             Descrição
-            <textarea rows={3} {...register('descricao')} />
+            <textarea className="painel-textarea-match-image" {...register('descricao')} />
           </label>
 
           <label>
             Imagem de capa
-            <input type="file" accept="image/*" onChange={(event) => setCapaFile(event.target.files?.[0] ?? null)} />
+            <ImageDropInput file={capaFile} onFileChange={setCapaFile} existingImageUrl={album?.capa} />
           </label>
-          {album?.capa && !capaFile && <img className="painel-thumb" src={album.capa} alt="Capa atual" />}
 
           <label>
             Data do evento
@@ -165,9 +182,6 @@ export function AlbumFormPage() {
         {erroGeral && <p className="painel-form-error">{erroGeral}</p>}
 
         <div className="painel-form-actions">
-          <button type="button" onClick={() => navigate('/painel/galeria')}>
-            Voltar
-          </button>
           <button type="submit" disabled={salvar.isPending}>
             {salvar.isPending ? 'Salvando…' : 'Salvar'}
           </button>

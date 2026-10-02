@@ -1,48 +1,65 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { uploadFotos, type UploadFotosResult } from '../../services/painel/galeriaApi'
+import { toast } from 'react-toastify'
+import { uploadFotos } from '../../services/painel/galeriaApi'
+import { FotoFormModal } from './FotoFormModal'
+import { IconUploadImage } from './icons'
 
 type GalleryUploaderProps = {
   albumId: number
 }
 
 export function GalleryUploader({ albumId }: GalleryUploaderProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
-  const [resultado, setResultado] = useState<UploadFotosResult | null>(null)
+  const [modalAberto, setModalAberto] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
 
   const enviar = useMutation({
-    mutationFn: (files: File[]) => uploadFotos(albumId, files),
+    mutationFn: (dados: { file: File; legenda: string; alt: string }) =>
+      uploadFotos(albumId, [dados.file], { legenda: dados.legenda, alt: dados.alt }),
     onSuccess: (data) => {
-      setResultado(data)
+      if (data.erros.length > 0) {
+        setErro(data.erros[0].erro)
+        return
+      }
       queryClient.invalidateQueries({ queryKey: ['painel', 'albuns', String(albumId)] })
+      toast.success('Foto adicionada com sucesso!')
+      setModalAberto(false)
     },
+    onError: () => setErro('Não foi possível enviar a foto.'),
   })
 
-  function onArquivosSelecionados(event: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? [])
-    event.target.value = ''
-    if (files.length === 0) return
-    setResultado(null)
-    enviar.mutate(files)
+  function abrirModal() {
+    setErro(null)
+    setModalAberto(true)
+  }
+
+  function onSubmit({ file, legenda, alt }: { file: File | null; legenda: string; alt: string }) {
+    if (!file) return
+    setErro(null)
+    enviar.mutate({ file, legenda, alt })
   }
 
   return (
     <div className="painel-gallery-uploader">
-      <button type="button" onClick={() => inputRef.current?.click()} disabled={enviar.isPending}>
-        {enviar.isPending ? 'Enviando…' : 'Enviar fotos'}
+      <button type="button" className="painel-primary-button" onClick={abrirModal}>
+        <IconUploadImage />
+        Adicionar foto
       </button>
-      <input ref={inputRef} type="file" accept="image/*" multiple hidden onChange={onArquivosSelecionados} />
-      {resultado && (
-        <div className="painel-upload-result">
-          {resultado.criadas.length > 0 && <p>{resultado.criadas.length} foto(s) adicionada(s).</p>}
-          {resultado.erros.map((erro) => (
-            <p key={erro.arquivo} className="painel-field-error">
-              {erro.arquivo}: {erro.erro}
-            </p>
-          ))}
-        </div>
-      )}
+
+      {modalAberto &&
+        createPortal(
+          <FotoFormModal
+            title="Adicionar foto"
+            exigirImagem
+            isPending={enviar.isPending}
+            error={erro}
+            onCancel={() => setModalAberto(false)}
+            onSubmit={onSubmit}
+          />,
+          document.body,
+        )}
     </div>
   )
 }

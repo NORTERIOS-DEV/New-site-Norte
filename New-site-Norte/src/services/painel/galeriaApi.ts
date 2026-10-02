@@ -58,9 +58,15 @@ export type UploadFotosResult = {
   erros: { arquivo: string; erro: string }[]
 }
 
-export function uploadFotos(albumId: number, files: File[]): Promise<UploadFotosResult> {
+export function uploadFotos(
+  albumId: number,
+  files: File[],
+  metadata?: { legenda?: string; alt?: string },
+): Promise<UploadFotosResult> {
   const fd = new FormData()
   files.forEach((file) => fd.append('fotos', file))
+  if (metadata?.legenda) fd.append('legenda', metadata.legenda)
+  if (metadata?.alt) fd.append('alt', metadata.alt)
   return painelFetchJson(`${BASE}/albuns/${albumId}/fotos/upload/`, { method: 'POST', body: fd })
 }
 
@@ -71,7 +77,14 @@ export function reordenarFotos(albumId: number, ordemIds: number[]): Promise<Fot
   })
 }
 
-export function updateFoto(id: number, data: { legenda?: string; alt?: string }): Promise<Foto> {
+export function updateFoto(id: number, data: { legenda?: string; alt?: string }, imagem?: File | null): Promise<Foto> {
+  if (imagem) {
+    const fd = new FormData()
+    if (data.legenda !== undefined) fd.append('legenda', data.legenda)
+    if (data.alt !== undefined) fd.append('alt', data.alt)
+    fd.append('imagem', imagem)
+    return painelFetchJson(`${BASE}/fotos/${id}/`, { method: 'PATCH', body: fd })
+  }
   return painelFetchJson(`${BASE}/fotos/${id}/`, { method: 'PATCH', body: data })
 }
 

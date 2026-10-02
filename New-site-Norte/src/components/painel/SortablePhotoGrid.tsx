@@ -1,4 +1,5 @@
-import { useEffect, useState, type FocusEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { createPortal } from 'react-dom'
 import {
   DndContext,
   closestCenter,
@@ -9,9 +10,14 @@ import {
 } from '@dnd-kit/core'
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
 import type { Foto } from '../../data/painel/painelTypes'
 import { deleteFoto, reordenarFotos, updateFoto } from '../../services/painel/galeriaApi'
+import { IconEdit, IconMore, IconTrash } from './icons'
+import { ConfirmModal } from './ConfirmModal'
+import { FotoFormModal } from './FotoFormModal'
 
 type SortablePhotoGridProps = {
   albumId: number
@@ -29,6 +35,7 @@ export function SortablePhotoGrid({ albumId, fotos }: SortablePhotoGridProps) {
   const reordenar = useMutation({
     mutationFn: (ids: number[]) => reordenarFotos(albumId, ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['painel', 'albuns', String(albumId)] }),
+    onError: () => toast.error('Não foi possível reordenar as fotos.'),
   })
 
   function onDragEnd(event: DragEndEvent) {
@@ -46,7 +53,12 @@ export function SortablePhotoGrid({ albumId, fotos }: SortablePhotoGridProps) {
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      modifiers={[restrictToParentElement]}
+      onDragEnd={onDragEnd}
+    >
       <SortableContext items={ordemLocal.map((f) => f.id)} strategy={rectSortingStrategy}>
         <div className="painel-photo-grid">
           {ordemLocal.map((foto) => (
@@ -61,6 +73,10 @@ export function SortablePhotoGrid({ albumId, fotos }: SortablePhotoGridProps) {
 function SortablePhotoItem({ foto, albumId }: { foto: Foto; albumId: number }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: foto.id })
   const queryClient = useQueryClient()
+  const [menuAberto, setMenuAberto] = useState(false)
+  const [modalAberto, setModalAberto] = useState(false)
+  const [confirmExcluirAberto, setConfirmExcluirAberto] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -70,47 +86,121 @@ function SortablePhotoItem({ foto, albumId }: { foto: Foto; albumId: number }) {
 
   const invalidar = () => queryClient.invalidateQueries({ queryKey: ['painel', 'albuns', String(albumId)] })
 
-  const salvarCampo = useMutation({
-    mutationFn: (data: { legenda?: string; alt?: string }) => updateFoto(foto.id, data),
-    onSuccess: invalidar,
+  const salvar = useMutation({
+    mutationFn: (data: { file: File | null; legenda: string; alt: string }) =>
+      updateFoto(foto.id, { legenda: data.legenda, alt: data.alt }, data.file),
+    onSuccess: () => {
+      invalidar()
+      toast.success('Foto atualizada com sucesso!')
+      setModalAberto(false)
+    },
+    onError: () => toast.error('Não foi possível salvar a foto.'),
   })
 
   const excluir = useMutation({
     mutationFn: () => deleteFoto(foto.id),
-    onSuccess: invalidar,
+    onSuccess: () => {
+      invalidar()
+      toast.success('Foto excluída com sucesso!')
+    },
+    onError: () => toast.error('Não foi possível excluir a foto.'),
   })
 
   function onExcluir() {
-    if (window.confirm('Excluir esta foto?')) excluir.mutate()
+    setMenuAberto(false)
+    setConfirmExcluirAberto(true)
   }
 
-  // Impede que o clique num input/botão dentro do card dispare o drag (o
+  function abrirEditar() {
+    setMenuAberto(false)
+    setModalAberto(true)
+  }
+
+  // Impede que o clique num botão/campo dentro do card dispare o drag (o
   // listener de arrastar do dnd-kit fica no card inteiro).
   function pararPropagacao(event: PointerEvent) {
     event.stopPropagation()
   }
 
-  function onLegendaBlur(event: FocusEvent<HTMLInputElement>) {
-    if (event.target.value !== foto.legenda) salvarCampo.mutate({ legenda: event.target.value })
-  }
-
-  function onAltBlur(event: FocusEvent<HTMLInputElement>) {
-    if (event.target.value !== foto.alt) salvarCampo.mutate({ alt: event.target.value })
-  }
+  // Fecha o menu de três pontinhos ao clicar fora dele.
+  useEffect(() => {
+    if (!menuAberto) return
+    function aoClicarFora(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setMenuAberto(false)
+    }
+    document.addEventListener('mousedown', aoClicarFora)
+    return () => document.removeEventListener('mousedown', aoClicarFora)
+  }, [menuAberto])
 
   return (
-    <div ref={setNodeRef} style={style} className="painel-photo-item" {...attributes} {...listeners}>
-      <img src={foto.miniatura || foto.imagem} alt={foto.alt} />
-      <input placeholder="Legenda" defaultValue={foto.legenda} onBlur={onLegendaBlur} onPointerDown={pararPropagacao} />
-      <input
-        placeholder="Texto alternativo"
-        defaultValue={foto.alt}
-        onBlur={onAltBlur}
-        onPointerDown={pararPropagacao}
-      />
-      <button type="button" className="destrutivo" onPointerDown={pararPropagacao} onClick={onExcluir}>
-        Excluir
-      </button>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`painel-photo-item${menuAberto ? ' painel-photo-item--menu-aberto' : ''}`}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="painel-photo-thumb">
+        <img src={foto.miniatura || foto.imagem} alt={foto.alt} />
+        <div className="painel-photo-menu-wrap" ref={menuRef} onPointerDown={pararPropagacao}>
+          <button
+            type="button"
+            className="painel-photo-menu-trigger"
+            data-tooltip="Mais ações"
+            onClick={() => setMenuAberto((aberto) => !aberto)}
+          >
+            <IconMore />
+            <span className="painel-sr-only">Mais ações</span>
+          </button>
+          {menuAberto && (
+            <div className="painel-photo-menu">
+              <button type="button" onClick={abrirEditar}>
+                <IconEdit />
+                Editar
+              </button>
+              <button type="button" className="destrutivo" onClick={onExcluir}>
+                <IconTrash />
+                Excluir
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {modalAberto &&
+        createPortal(
+          <div onPointerDown={pararPropagacao}>
+            <FotoFormModal
+              title="Editar foto"
+              existingImageUrl={foto.miniatura || foto.imagem}
+              initialLegenda={foto.legenda}
+              initialAlt={foto.alt}
+              isPending={salvar.isPending}
+              onCancel={() => setModalAberto(false)}
+              onSubmit={(data) => salvar.mutate(data)}
+            />
+          </div>,
+          document.body,
+        )}
+
+      {confirmExcluirAberto &&
+        createPortal(
+          <div onPointerDown={pararPropagacao}>
+            <ConfirmModal
+              title="Excluir foto"
+              message="Tem certeza que deseja excluir esta foto? Essa ação não pode ser desfeita."
+              confirmLabel="Excluir"
+              variant="danger"
+              isPending={excluir.isPending}
+              onCancel={() => setConfirmExcluirAberto(false)}
+              onConfirm={() => {
+                excluir.mutate()
+                setConfirmExcluirAberto(false)
+              }}
+            />
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }
