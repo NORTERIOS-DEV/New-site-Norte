@@ -6,6 +6,8 @@
   --painel-image-input-height: 140px;
 }
 
+.painel-profile-section { margin-top: 2rem; }
+
 .painel-loading {
   display: flex;
   align-items: center;
@@ -710,6 +712,9 @@
 .painel-modal input[type='text'],
 .painel-modal input[type='date'],
 .painel-modal input[type='url'],
+.painel-modal input[type='email'],
+.painel-modal input[type='tel'],
+.painel-modal input[type='password'],
 .painel-modal input:not([type]),
 .painel-modal textarea,
 .painel-modal select {
@@ -858,6 +863,8 @@
   gap: 1rem 1.25rem;
   margin-bottom: 1.5rem;
 }
+
+.painel-form-grid .painel-field-full { grid-column: 1 / -1; }
 
 /* Divide o form de post em seções (ex.: campos principais vs. SEO) sem
    quebrar em sub-formulários separados - só um título entre dois

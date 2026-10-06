@@ -11,6 +11,12 @@ export type PainelUser = {
   last_name: string
   groups: string[]
   permissions: string[]
+  nome_completo: string
+  telefone: string
+  cargo: string
+  tipo: 'gerente' | 'autor' | 'comum'
+  is_active: boolean
+  autor: number | null
 }
 
 export async function login(username: string, password: string): Promise<void> {
@@ -40,6 +46,7 @@ export function refreshAccessToken(): Promise<boolean> {
       .then(async (res) => {
         if (!res.ok) return false
         const data = await res.json()
+        if (tokenStore.getRefreshToken() !== refresh) return false
         tokenStore.setTokens({ access: data.access, refresh: data.refresh ?? refresh })
         return true
       })

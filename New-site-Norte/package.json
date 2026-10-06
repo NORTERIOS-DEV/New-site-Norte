@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "test:accounts": "node scripts/test-accounts.mjs",
     "test:editor": "node scripts/test-editor.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",

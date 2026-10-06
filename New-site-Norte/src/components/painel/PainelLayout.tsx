@@ -9,6 +9,8 @@ const NAV_ITEMS = [
   { to: '/painel/categorias', label: 'Categorias' },
   { to: '/painel/autores', label: 'Autores' },
   { to: '/painel/galeria', label: 'Galeria' },
+  { to: '/painel/usuarios', label: 'Usuários' },
+  { to: '/painel/perfil', label: 'Meu perfil' },
 ]
 
 export function PainelLayout() {
@@ -36,7 +38,7 @@ export function PainelLayout() {
           <span>Norte Rios</span>
         </div>
         <nav>
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.filter((item) => user?.tipo === 'gerente' || item.to === '/painel/perfil' || (user?.tipo === 'autor' && item.to === '/painel/posts')).map((item) => (
             <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? 'active' : '')}>
               {item.label}
             </NavLink>

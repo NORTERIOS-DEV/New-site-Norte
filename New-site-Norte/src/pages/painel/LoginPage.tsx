@@ -11,7 +11,7 @@ type LoginFormValues = {
 }
 
 export function LoginPage() {
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [erro, setErro] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export function LoginPage() {
   } = useForm<LoginFormValues>()
 
   if (isAuthenticated) {
-    const from = (location.state as { from?: Location })?.from?.pathname ?? '/painel/posts'
+    const from = user?.tipo === 'comum' ? '/painel/perfil' : ((location.state as { from?: Location })?.from?.pathname ?? '/painel/posts')
     return <Navigate to={from} replace />
   }
 
@@ -30,8 +30,7 @@ export function LoginPage() {
     setErro(null)
     try {
       await login(data.username, data.password)
-      const from = (location.state as { from?: Location })?.from?.pathname ?? '/painel/posts'
-      navigate(from, { replace: true })
+      navigate('/painel', { replace: true })
     } catch {
       setErro('Usuário ou senha inválidos.')
     }

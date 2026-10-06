@@ -11,10 +11,12 @@ import { ConfirmModal } from '../../components/painel/ConfirmModal'
 import { PainelPageHeader } from '../../components/painel/PainelPageHeader'
 import '../../styles/painel.css'
 import { toast } from 'react-toastify'
+import { useAuth } from '../../context/AuthContext'
 
 type ConfirmStatusAction = { post: Post; acao: 'publicar' | 'despublicar' }
 
 export function PostsListPage() {
+  const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [confirmStatus, setConfirmStatus] = useState<ConfirmStatusAction | null>(null)
   const [confirmExcluir, setConfirmExcluir] = useState<Post | null>(null)
@@ -39,7 +41,7 @@ export function PostsListPage() {
   })
 
   const { data: categorias } = useQuery({ queryKey: ['painel', 'categorias'], queryFn: listCategorias })
-  const { data: autores } = useQuery({ queryKey: ['painel', 'autores'], queryFn: listAutores })
+  const { data: autores } = useQuery({ queryKey: ['painel', 'autores'], queryFn: listAutores, enabled: user?.tipo === 'gerente' })
 
   function atualizarFiltro(campo: string, valor: string) {
     const next = new URLSearchParams(searchParams)

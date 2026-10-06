@@ -46,10 +46,11 @@ export async function painelFetch(path: string, options: PainelFetchOptions = {}
   let res = await doFetch(path, options)
 
   if (res.status === 401 && tokenStore.getRefreshToken()) {
+    const attemptedRefresh = tokenStore.getRefreshToken()
     const refreshed = await refreshAccessToken()
     if (refreshed) {
       res = await doFetch(path, options)
-    } else {
+    } else if (tokenStore.getRefreshToken() === attemptedRefresh) {
       tokenStore.clear()
     }
   }

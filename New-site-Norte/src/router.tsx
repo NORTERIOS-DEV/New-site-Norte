@@ -42,6 +42,10 @@ export const router = createBrowserRouter([
       {
         lazy: () => import('./components/painel/PainelLayout').then((m) => ({ Component: m.PainelLayout })),
         children: [
+          { path: 'usuarios', lazy: () => import('./pages/painel/UsuariosPage').then((m) => ({ Component: m.UsuariosPage })) },
+          { path: 'usuarios/:id', lazy: () => import('./pages/painel/UsuariosPage').then((m) => ({ Component: m.UsuarioDetailPage })) },
+          { path: 'perfil', lazy: () => import('./pages/painel/PerfilPage').then((m) => ({ Component: m.PerfilPage })) },
+          { path: 'perfil/editar', lazy: () => import('./pages/painel/PerfilPage').then((m) => ({ Component: m.PerfilPage })) },
           { index: true, element: <Navigate to="posts" replace /> },
           {
             path: 'posts',

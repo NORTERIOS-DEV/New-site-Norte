@@ -37,7 +37,7 @@ export type PostInput = {
   slug?: string
   resumo: string
   conteudo_json: JSONContent | null
-  autor: number
+  autor?: number
   categoria?: number | null
   destaque?: boolean
   status: string
@@ -59,9 +59,9 @@ function buildFormData(data: PostInput, arquivos?: PostArquivos, opcoes?: { incl
   if (data.slug) fd.append('slug', data.slug)
   fd.append('resumo', data.resumo)
   fd.append('conteudo_json', JSON.stringify(data.conteudo_json ?? null))
-  fd.append('autor', String(data.autor))
+  if (data.autor !== undefined) fd.append('autor', String(data.autor))
   if (data.categoria) fd.append('categoria', String(data.categoria))
-  fd.append('destaque', String(Boolean(data.destaque)))
+  if (data.destaque !== undefined) fd.append('destaque', String(data.destaque))
   if (incluirStatus) {
     fd.append('status', data.status)
     if (data.data_publicacao) fd.append('data_publicacao', data.data_publicacao)

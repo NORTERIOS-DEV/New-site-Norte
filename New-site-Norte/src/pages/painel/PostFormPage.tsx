@@ -21,6 +21,9 @@ import { IconArrowLeft, IconPost } from '../../components/painel/icons'
 import { PainelPageHeader } from '../../components/painel/PainelPageHeader'
 import '../../styles/painel.css'
 import { toast } from 'react-toastify'
+import { useAuth } from '../../context/AuthContext'
+import type { Autor } from '../../data/painel/painelTypes'
+import { painelFetchJson } from '../../services/painel/httpClient'
 
 type FormValues = {
   titulo: string
@@ -58,6 +61,8 @@ function toDatetimeLocal(iso: string | null): string {
 }
 
 export function PostFormPage() {
+  const { user } = useAuth()
+  const isManager = user?.tipo === 'gerente'
   const { id } = useParams()
   const isEdicao = Boolean(id)
   const navigate = useNavigate()
@@ -70,7 +75,7 @@ export function PostFormPage() {
   })
 
   const { data: categorias } = useQuery({ queryKey: ['painel', 'categorias'], queryFn: listCategorias })
-  const { data: autores } = useQuery({ queryKey: ['painel', 'autores'], queryFn: listAutores })
+  const { data: autores } = useQuery({ queryKey: ['painel', 'autores', user?.id], queryFn: () => isManager ? listAutores() : painelFetchJson<Autor>('/auth/me/autor/').then((autor) => [autor]) })
 
   const [conteudoJson, setConteudoJson] = useState<JSONContent | null>(null)
   const [imagemCapaFile, setImagemCapaFile] = useState<File | null>(null)
@@ -94,6 +99,10 @@ export function PostFormPage() {
     reset,
     formState: { errors },
   } = useForm<FormValues>({ defaultValues: FORM_DEFAULTS })
+
+  useEffect(() => {
+    if (!isManager && user?.autor) setValue('autor', String(user.autor))
+  }, [isManager, user?.autor, setValue])
 
   const titulo = watch('titulo')
   const status = watch('status')
@@ -220,9 +229,9 @@ export function PostFormPage() {
         slug: slug || undefined,
         resumo,
         conteudo_json: conteudoJson,
-        autor: Number(autorCampo),
+        autor: isManager ? Number(autorCampo) : undefined,
         categoria: categoriaCampo ? Number(categoriaCampo) : null,
-        destaque: destaqueCampo,
+        destaque: isManager ? destaqueCampo : undefined,
         status,
         tempo_leitura_minutos: tempoLeituraCampo ? Number(tempoLeituraCampo) : estimativaLeitura,
         meta_title: metaTitleCampo,
@@ -294,9 +303,9 @@ export function PostFormPage() {
         slug: data.slug || undefined,
         resumo: data.resumo,
         conteudo_json: conteudoJson,
-        autor: Number(data.autor),
+        autor: isManager ? Number(data.autor) : undefined,
         categoria: data.categoria ? Number(data.categoria) : null,
-        destaque: data.destaque,
+        destaque: isManager ? data.destaque : undefined,
         status: data.status,
         data_publicacao: data.data_publicacao ? new Date(data.data_publicacao).toISOString() : null,
         tempo_leitura_minutos: data.tempo_leitura_minutos ? Number(data.tempo_leitura_minutos) : estimativaLeitura,
@@ -455,7 +464,7 @@ export function PostFormPage() {
           <div className="painel-field">
             <label>
               Autor
-              <select {...register('autor', { required: true })}>
+              <select disabled={!isManager} {...register('autor', { required: isManager })}>
                 <option value="">Selecione…</option>
                 {autores?.map((a) => (
                   <option key={a.id} value={a.id}>
@@ -503,13 +512,13 @@ export function PostFormPage() {
             <input type="number" min={1} {...register('tempo_leitura_minutos')} />
           </label>
 
-          <div className="painel-field">
+          {isManager && <div className="painel-field">
             <label className="painel-checkbox">
               <input type="checkbox" {...register('destaque')} />
               Destaque na home
             </label>
             <small className="painel-field-hint">Desmarca automaticamente o destaque de qualquer outro post.</small>
-          </div>
+          </div>}
         </div>
 
         <h3 className="painel-form-section-title">SEO e compartilhamento</h3>
