@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/', include('blog.urls')),
     path('api/galeria/', include('galeria.urls')),
     path('api/painel/auth/', include('accounts.urls')),
+    path('api/painel/', include('accounts.urls_users')),
     path('api/painel/', include('blog.urls_painel')),
     path('api/painel/galeria/', include('galeria.urls_painel')),
     path('api/painel/uploads/', include('uploads.urls')),

@@ -1,8 +1,8 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from .authentication import SessionAuthentication
 
-from .permissions import DjangoModelPermissionsWithView
+from .permissions import IsManager
 
 
 class PainelModelViewSet(ModelViewSet):
@@ -13,5 +13,5 @@ class PainelModelViewSet(ModelViewSet):
     auth/permissions here are opt-in per viewset, not a global default.
     """
 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated, IsManager]

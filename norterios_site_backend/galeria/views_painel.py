@@ -6,9 +6,9 @@ from rest_framework.mixins import DestroyModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from accounts.authentication import SessionAuthentication
 
-from accounts.permissions import DjangoModelPermissionsWithView
+from accounts.permissions import IsManager
 from accounts.viewsets import PainelModelViewSet
 
 from .models import Album, Categoria, Foto
@@ -84,8 +84,8 @@ class FotoPainelViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
 
     queryset = Foto.objects.all()
     serializer_class = FotoPainelSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated, IsManager]
 
 
 class CategoriaPainelViewSet(PainelModelViewSet):

@@ -7,7 +7,8 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from accounts.authentication import SessionAuthentication
+from accounts.permissions import IsEditor
 
 from galeria.services import process_new_image
 
@@ -19,8 +20,8 @@ class ImageUploadView(APIView):
     TipTap). Capa de post/álbum e foto de autor não passam por aqui - são
     ImageFields normais, enviados direto no multipart do próprio formulário."""
 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated, IsEditor]
     parser_classes = [MultiPartParser]
 
     def post(self, request):

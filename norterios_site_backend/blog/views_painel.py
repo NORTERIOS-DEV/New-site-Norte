@@ -6,6 +6,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts.viewsets import PainelModelViewSet
+from accounts.permissions import IsEditor, CategoryPermission
+from accounts.models import perfil_usuario
 
 from .models import Autor, Categoria, Post
 from .serializers_painel import AutorPainelSerializer, CategoriaPainelSerializer, PostPainelSerializer
@@ -19,6 +21,7 @@ ORDENACOES_PERMITIDAS = {
 
 
 class PostPainelViewSet(PainelModelViewSet):
+    permission_classes = [IsEditor]
     serializer_class = PostPainelSerializer
 
     def create(self, request, *args, **kwargs):
@@ -35,6 +38,9 @@ class PostPainelViewSet(PainelModelViewSet):
 
     def get_queryset(self):
         queryset = Post.objects.select_related('autor', 'categoria').all()
+        perfil = perfil_usuario(self.request.user)
+        if perfil.tipo == 'autor':
+            queryset = queryset.filter(autor_id=perfil.autor_id)
         params = self.request.query_params
 
         titulo = params.get('titulo')
@@ -88,6 +94,7 @@ class PostPainelViewSet(PainelModelViewSet):
 
 
 class CategoriaPainelViewSet(PainelModelViewSet):
+    permission_classes = [CategoryPermission]
     # Sem paginação: lista pequena, usada também como fonte dos selects de
     # categoria no formulário de post (que precisa de todas, não só 10).
     queryset = Categoria.objects.all()
@@ -103,6 +110,8 @@ class AutorPainelViewSet(PainelModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if hasattr(instance, 'perfil_conta'):
+            return Response({'detail': 'Este autor está vinculado a uma conta.'}, status=status.HTTP_400_BAD_REQUEST)
         if instance.posts.exists():
             return Response(
                 {'detail': 'Não é possível excluir um autor com postagens associadas. Desative-o em vez disso.'},

@@ -52,7 +52,7 @@ class CategoriaPainelSerializer(serializers.ModelSerializer):
 
 class PostPainelSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(required=False, allow_blank=True)
-    autor = serializers.PrimaryKeyRelatedField(queryset=Autor.objects.filter(ativo=True))
+    autor = serializers.PrimaryKeyRelatedField(queryset=Autor.objects.filter(ativo=True), required=False)
     autor_nome = serializers.CharField(source='autor.nome', read_only=True)
     categoria = serializers.PrimaryKeyRelatedField(
         queryset=Categoria.objects.filter(ativo=True), allow_null=True, required=False,
@@ -104,6 +104,17 @@ class PostPainelSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        from accounts.models import perfil_usuario
+        perfil = perfil_usuario(self.context['request'].user)
+        if perfil.tipo == 'autor':
+            if 'autor' in attrs and attrs['autor'].pk != perfil.autor_id:
+                raise serializers.ValidationError({'autor': 'Você só pode usar sua própria autoria.'})
+            if 'destaque' in self.initial_data:
+                raise serializers.ValidationError({'destaque': 'Somente gerentes podem definir destaque.'})
+            attrs.pop('destaque', None)
+            attrs['autor'] = perfil.autor
+        elif not self.instance and 'autor' not in attrs:
+            raise serializers.ValidationError({'autor': 'Informe o autor.'})
         status_in = attrs.get('status')
 
         if status_in == Post.STATUS_AGENDADO:

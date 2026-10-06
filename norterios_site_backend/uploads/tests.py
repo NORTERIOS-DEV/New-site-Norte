@@ -27,6 +27,10 @@ def make_image_file(fmt='JPEG', name=None):
 class ImageUploadViewTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user('editor', password='senha123', is_staff=True)
+        from accounts.models import perfil_usuario
+        perfil = perfil_usuario(self.user)
+        perfil.tipo = 'autor'
+        perfil.save()
         self.client.force_authenticate(user=self.user)
 
     def test_upload_gif_rejeitado(self):
