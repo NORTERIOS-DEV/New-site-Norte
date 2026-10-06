@@ -5,7 +5,7 @@ ALLOWED_NODE_TYPES = {
     'blockquote', 'horizontalRule', 'hardBreak', 'image', 'table', 'tableRow',
     'tableHeader', 'tableCell', 'videoEmbed',
 }
-ALLOWED_MARK_TYPES = {'bold', 'italic', 'underline', 'link'}
+ALLOWED_MARK_TYPES = {'bold', 'italic', 'underline', 'link', 'textStyle'}
 
 
 def validate_tiptap_document(node):

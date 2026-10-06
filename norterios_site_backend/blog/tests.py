@@ -1,16 +1,35 @@
 from datetime import timedelta
 from io import BytesIO
+import json
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings
+from django.core.exceptions import ValidationError
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
 from rest_framework.test import APITestCase
 
 from .models import Autor, Post
+from .validators import validate_tiptap_document
+
+
+class TipTapFormattingTests(SimpleTestCase):
+    def documento(self, mark):
+        return {'type': 'doc', 'content': [{'type': 'paragraph', 'content': [
+            {'type': 'text', 'text': 'Texto', 'marks': [mark]},
+        ]}]}
+
+    def test_aceita_estilos_tipograficos_combinados(self):
+        validate_tiptap_document(self.documento({'type': 'textStyle', 'attrs': {
+            'fontFamily': 'Georgia, serif', 'fontSize': '24px', 'color': '#427443',
+        }}))
+
+    def test_rejeita_marca_desconhecida(self):
+        with self.assertRaises(ValidationError):
+            validate_tiptap_document(self.documento({'type': 'unknownStyle'}))
 
 TEST_STORAGES = {
     **settings.STORAGES,
@@ -63,6 +82,31 @@ class PostPainelApiTests(APITestCase):
         self.assertIn('imagem_capa', response.data)
         post.refresh_from_db()
         self.assertEqual(post.status, Post.STATUS_RASCUNHO)
+
+    def test_salva_e_reabre_post_com_estilos_tipograficos(self):
+        doc = {'type': 'doc', 'content': [{'type': 'paragraph', 'content': [{
+            'type': 'text', 'text': 'Texto formatado', 'marks': [
+                {'type': 'bold'},
+                {'type': 'textStyle', 'attrs': {
+                    'fontFamily': 'Georgia, serif', 'fontSize': '24px', 'color': '#427443',
+                }},
+            ],
+        }]}]}
+        response = self._criar_post(conteudo_json=json.dumps(doc))
+        self.assertEqual(response.status_code, 201)
+        post = Post.objects.get(pk=response.data['id'])
+        self.assertEqual(post.conteudo_json, doc)
+        detail = self.client.get(reverse('painel-post-detail', args=[post.id]))
+        self.assertEqual(detail.status_code, 200)
+        self.assertEqual(detail.data['conteudo_json'], doc)
+
+    def test_api_rejeita_marca_desconhecida(self):
+        doc = {'type': 'doc', 'content': [{'type': 'paragraph', 'content': [{
+            'type': 'text', 'text': 'Texto', 'marks': [{'type': 'unknownStyle'}],
+        }]}]}
+        response = self._criar_post(conteudo_json=json.dumps(doc))
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('conteudo_json', response.data)
 
     def test_publicar_com_imagem_sem_alt_falha(self):
         post = Post.objects.create(
