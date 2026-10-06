@@ -6,6 +6,7 @@ import { cleanPastedHtml } from '../../tiptap/pasteClean'
 import { uploadImagem } from '../../services/painel/uploadsApi'
 import { TipTapToolbar } from './TipTapToolbar'
 import { TipTapBubbleMenu } from './TipTapBubbleMenu'
+import { TipTapTableMenu } from './TipTapTableMenu'
 import '../../styles/tiptap.css'
 
 /** Faz upload de uma imagem solta via paste/drop e insere o node na posição
@@ -112,6 +113,7 @@ export function TipTapEditor({ content, onChange }: TipTapEditorProps) {
     <div className={`tiptap-editor${maximizado ? ' tiptap-editor--maximizado' : ''}`}>
       <TipTapToolbar editor={editor} maximizado={maximizado} onAlternarMaximizado={() => setMaximizado((v) => !v)} />
       {editor && <TipTapBubbleMenu editor={editor} />}
+      {editor && <TipTapTableMenu editor={editor} />}
       <EditorContent editor={editor} className="tiptap-content" />
     </div>
   )

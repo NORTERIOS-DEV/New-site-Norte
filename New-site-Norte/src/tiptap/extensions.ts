@@ -1,4 +1,5 @@
 import StarterKit from '@tiptap/starter-kit'
+import { TextStyle, FontFamily, Color, FontSize } from '@tiptap/extension-text-style'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import Placeholder from '@tiptap/extension-placeholder'
@@ -23,12 +24,13 @@ import { VideoEmbedEditor } from './videoEmbedNodeEditor'
  * Heading disponível em H1/H2/H3 (H4 fica de fora, sem pedido pra isso).
  */
 export const tiptapExtensions = [
+  TextStyle, FontFamily, Color, FontSize,
   StarterKit.configure({
     heading: { levels: [1, 2, 3] },
     link: { openOnClick: false, autolink: true },
   }),
   Image,
-  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }),
   Placeholder.configure({ placeholder: 'Escreva o conteúdo da postagem…' }),
   CharacterCount,
   Table.configure({ resizable: true }),

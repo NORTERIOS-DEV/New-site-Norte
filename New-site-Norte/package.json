@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "test:editor": "node scripts/test-editor.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "postbuild": "node scripts/copy-404.mjs",
@@ -26,6 +27,7 @@
     "@tiptap/extension-table-header": "^3.31.3",
     "@tiptap/extension-table-row": "^3.31.3",
     "@tiptap/extension-text-align": "^3.31.3",
+    "@tiptap/extension-text-style": "^3.31.3",
     "@tiptap/html": "^3.31.3",
     "@tiptap/pm": "^3.31.3",
     "@tiptap/react": "^3.31.3",
@@ -42,6 +44,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
+    "happy-dom": "^20.14.5",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   },

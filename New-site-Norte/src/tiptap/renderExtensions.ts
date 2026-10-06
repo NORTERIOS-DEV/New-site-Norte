@@ -1,4 +1,5 @@
 import StarterKit from '@tiptap/starter-kit'
+import { TextStyle, FontFamily, Color, FontSize } from '@tiptap/extension-text-style'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import { Table } from '@tiptap/extension-table'
@@ -17,6 +18,7 @@ import { VideoEmbed } from './videoEmbedNode'
  * pro /painel.
  */
 export const tiptapRenderExtensions = [
+  TextStyle, FontFamily, Color, FontSize,
   StarterKit.configure({
     // Mantém até H4 aqui (extensions.ts só permite criar H1-H3 na toolbar):
     // posts legados podem ter H4 persistido no conteudo_json, e o render
@@ -26,7 +28,7 @@ export const tiptapRenderExtensions = [
     link: { openOnClick: false, autolink: true },
   }),
   Image,
-  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }),
   Table.configure({ resizable: true }),
   TableRow,
   TableHeader,

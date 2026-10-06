@@ -8,8 +8,8 @@
 .tiptap-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  align-items: center;
+  gap: 0.5rem;
+  align-items: stretch;
   padding: 0.5rem;
   border-bottom: 1px solid #eaecf0;
   background: #f9fafb;
@@ -54,9 +54,60 @@
   border-color: #a6f4c5;
 }
 
-/* Empurra o botão de maximizar pro fim da barra, mesmo quando os grupos
-   anteriores quebram linha (flex-wrap). */
-.tiptap-toolbar button.tiptap-maximize-btn {
+.tiptap-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #eaecf0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.tiptap-toolbar-group-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.tiptap-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.tiptap-toolbar-group:not(.tiptap-toolbar-group--font) .tiptap-toolbar-group-controls {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  align-content: center;
+}
+
+.tiptap-toolbar-group-controls > .tiptap-toolbar-row {
+  grid-column: 1 / -1;
+}
+
+.tiptap-toolbar button:focus-visible {
+  outline: 2px solid #067647;
+  outline-offset: 2px;
+}
+
+.tiptap-toolbar-group-label {
+  padding-top: 0.25rem;
+  border-top: 1px solid #eaecf0;
+  color: #667085;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.tiptap-toolbar-group--view {
   margin-left: auto;
 }
 
@@ -65,6 +116,58 @@
   align-self: stretch;
   background: #eaecf0;
   margin: 0 0.25rem;
+}
+
+.tiptap-text-style-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+}
+
+.tiptap-text-style-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #344054;
+}
+
+.tiptap-text-style-controls select,
+.tiptap-text-style-controls input[type="color"] {
+  height: 32px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #344054;
+  font: inherit;
+  max-width: 155px;
+  min-width: 0;
+}
+
+.tiptap-text-style-controls input[type="color"] {
+  width: 36px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.tiptap-color-status {
+  font-size: 0.7rem;
+  color: #475467;
+}
+
+.tiptap-toolbar button.tiptap-color-reset {
+  width: auto;
+  padding: 0 0.4rem;
+  font-weight: 500;
+}
+
+.tiptap-text-style-controls select:focus-visible,
+.tiptap-text-style-controls input:focus-visible,
+.tiptap-text-style-controls button:focus-visible {
+  outline: 2px solid #067647;
+  outline-offset: 2px;
 }
 
 /* Texto acessível para leitores de tela nos botões só-de-ícone (mesma ideia
@@ -158,6 +261,12 @@
   color: #f2f4f7;
 }
 
+.tiptap-table-menu button {
+  width: auto;
+  padding: 0 0.75rem;
+  color: #b42318;
+}
+
 .tiptap-bubble-menu button svg {
   width: 16px;
   height: 16px;
@@ -176,6 +285,14 @@
    flex-wrap já existente) e o bubble menu nunca estoura a largura da
    viewport, mesmo perto da borda. */
 @media (max-width: 600px) {
+  .tiptap-toolbar-group--font {
+    flex-basis: 100%;
+  }
+
+  .tiptap-toolbar-group--font .tiptap-text-style-controls {
+    justify-content: center;
+  }
+
   .tiptap-toolbar button {
     width: 29px;
     height: 29px;
@@ -234,8 +351,31 @@ body.tiptap-scroll-lock {
 }
 
 .tiptap-content img {
+  display: block;
   max-width: 100%;
+  height: auto;
   border-radius: 8px;
+}
+
+/* O text-align salvo no próprio img precisa de margens para mover o bloco. */
+.tiptap-content img[style*="text-align: left"] {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.tiptap-content img[style*="text-align: center"] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap-content img[style*="text-align: right"] {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.tiptap-content img.ProseMirror-selectednode {
+  outline: 2px solid #067647;
+  outline-offset: 2px;
 }
 
 .tiptap-content table {

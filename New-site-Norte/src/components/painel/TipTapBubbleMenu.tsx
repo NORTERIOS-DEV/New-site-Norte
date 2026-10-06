@@ -1,4 +1,5 @@
 import type { Editor } from '@tiptap/core'
+import { isTextSelection } from '@tiptap/core'
 import { BubbleMenu } from '@tiptap/react/menus'
 import { promptForLink } from '../../tiptap/linkPrompt'
 import { IconBold, IconItalic, IconLink, IconUnderline } from '../../tiptap/toolbarIcons'
@@ -12,7 +13,12 @@ export function TipTapBubbleMenu({ editor }: TipTapBubbleMenuProps) {
     <BubbleMenu
       editor={editor}
       className="tiptap-bubble-menu"
-      shouldShow={({ editor, state }) => !state.selection.empty && editor.isEditable}
+      shouldShow={({ editor, state }) =>
+        editor.isEditable &&
+        isTextSelection(state.selection) &&
+        !state.selection.empty &&
+        state.doc.textBetween(state.selection.from, state.selection.to).trim().length > 0
+      }
     >
       <button
         type="button"

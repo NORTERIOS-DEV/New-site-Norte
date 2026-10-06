@@ -444,6 +444,28 @@
   border-radius: var(--r-lg);
   margin: 1.2em 0;
 }
+
+/* Só imagens com alinhamento explícito deixam de ocupar toda a largura.
+   Dimensões HTML salvas continuam valendo; posts antigos mantêm o estilo acima. */
+.post-content img[style*="text-align:"] {
+  width: auto;
+  max-width: 100%;
+}
+
+.post-content img[style*="text-align: left"] {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.post-content img[style*="text-align: center"] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.post-content img[style*="text-align: right"] {
+  margin-left: auto;
+  margin-right: 0;
+}
 .post-content ul,
 .post-content ol {
   margin: 0 0 1.2em;
