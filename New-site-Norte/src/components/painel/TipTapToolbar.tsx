@@ -17,7 +17,6 @@ import {
   IconListOrdered,
   IconMaximize,
   IconMinimize,
-  IconParagraph,
   IconQuote,
   IconRedo,
   IconTable,
@@ -32,7 +31,6 @@ type TipTapToolbarProps = {
   onAlternarMaximizado: () => void
 }
 
-const HEADING_LEVELS = [1, 2, 3] as const
 
 type ToolbarButtonProps = {
   title: string
@@ -68,12 +66,11 @@ function ToolbarGroup({ label, children, className = '' }: { label: string; chil
 
 export function TipTapToolbar({ editor, maximizado, onAlternarMaximizado }: TipTapToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const alignment = useEditorState({
+  const toolbarState = useEditorState({
     editor,
     selector: ({ editor }) => {
       if (!editor) return null
-      if (editor.isActive('image')) return editor.getAttributes('image').textAlign ?? 'left'
-      return ['left', 'center', 'right'].find((value) => editor.isActive({ textAlign: value })) ?? null
+      return { alignment: editor.isActive('image') ? editor.getAttributes('image').textAlign ?? 'left' : ['left', 'center', 'right'].find((value) => editor.isActive({ textAlign: value })) ?? null, selection: editor.state.selection, doc: editor.state.doc, marks: editor.state.storedMarks }
     },
   })
 
@@ -107,7 +104,7 @@ export function TipTapToolbar({ editor, maximizado, onAlternarMaximizado }: TipT
   return (
     <div className="tiptap-toolbar" role="group" aria-label="Ferramentas de edição do post">
       <ToolbarGroup label="Fonte" className="tiptap-toolbar-group--font">
-      <TipTapTextStyleControls editor={editor} />
+      <TipTapTextStyleControls editor={editor}>
       <div className="tiptap-toolbar-row" role="group" aria-label="Ênfase do texto">
         <ToolbarButton title="Negrito" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
           <IconBold />
@@ -127,26 +124,21 @@ export function TipTapToolbar({ editor, maximizado, onAlternarMaximizado }: TipT
         <IconUnderline />
       </ToolbarButton>
       </div>
+      </TipTapTextStyleControls>
       </ToolbarGroup>
       <ToolbarGroup label="Estilos">
-        {HEADING_LEVELS.map((nivel) => (
-          <ToolbarButton
-            key={nivel}
-            title={`Título ${nivel}`}
-            active={editor.isActive('heading', { level: nivel })}
-            className="tiptap-heading-btn"
-            onClick={() => editor.chain().focus().toggleHeading({ level: nivel }).run()}
-          >
-            H{nivel}
-          </ToolbarButton>
-        ))}
-        <ToolbarButton
-          title="Parágrafo"
-          active={editor.isActive('paragraph')}
-          onClick={() => editor.chain().focus().setParagraph().run()}
-        >
-          <IconParagraph />
-        </ToolbarButton>
+        <select className="tiptap-block-style" aria-label="Estilo do parágrafo"
+          value={[1, 2, 3].find((level) => editor.isActive('heading', { level })) ?? ''}
+          onChange={(event) => {
+            const level = Number(event.target.value)
+            if (level) editor.chain().focus().setHeading({ level: level as 1 | 2 | 3 }).run()
+            else editor.chain().focus().setParagraph().run()
+          }}>
+          <option value="">Texto normal</option>
+          <option value="1">Título 1</option>
+          <option value="2">Título 2</option>
+          <option value="3">Título 3</option>
+        </select>
       </ToolbarGroup>
       <ToolbarGroup label="Parágrafo">
       <div className="tiptap-toolbar-row" role="group" aria-label="Listas e citação">
@@ -175,21 +167,21 @@ export function TipTapToolbar({ editor, maximizado, onAlternarMaximizado }: TipT
       <div className="tiptap-toolbar-row" role="group" aria-label="Alinhamento">
         <ToolbarButton
           title="Alinhar à esquerda"
-          active={alignment === 'left'}
+          active={toolbarState?.alignment === 'left'}
           onClick={() => editor.chain().focus().setTextAlign('left').run()}
         >
           <IconAlignLeft />
         </ToolbarButton>
         <ToolbarButton
           title="Centralizar"
-          active={alignment === 'center'}
+          active={toolbarState?.alignment === 'center'}
           onClick={() => editor.chain().focus().setTextAlign('center').run()}
         >
           <IconAlignCenter />
         </ToolbarButton>
         <ToolbarButton
           title="Alinhar à direita"
-          active={alignment === 'right'}
+          active={toolbarState?.alignment === 'right'}
           onClick={() => editor.chain().focus().setTextAlign('right').run()}
         >
           <IconAlignRight />

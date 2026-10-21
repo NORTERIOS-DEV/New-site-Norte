@@ -1518,3 +1518,26 @@
     width: 100%;
   }
 }
+/* Na tela de postagem, o documento controla a rolagem do formulario. */
+.painel-shell:has(.painel-post-form) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
+.painel-shell:has(.painel-post-form) .painel-content {
+  overflow: visible;
+}
+
+.painel-shell:has(.painel-post-form) .painel-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  align-self: flex-start;
+}
+
+@media (max-width: 880px) {
+  .painel-shell:has(.painel-post-form) .painel-sidebar {
+    position: fixed;
+  }
+}

@@ -451,3 +451,33 @@ body.tiptap-scroll-lock {
   padding: 0.3rem 0.6rem;
   cursor: pointer;
 }
+/* Barra compacta inspirada nos controles do Google Docs. */
+.tiptap-toolbar { align-items: center; gap: 4px 0; padding: 8px; background: #edf2fa; }
+.tiptap-toolbar-group { flex-direction: row; align-items: center; padding: 0 6px; border: 0; border-right: 1px solid #c7cbd1; border-radius: 0; background: transparent; }
+.tiptap-toolbar-group:last-child { border-right: 0; }
+.tiptap-toolbar-group-controls,
+.tiptap-toolbar-group:not(.tiptap-toolbar-group--font) .tiptap-toolbar-group-controls { display: flex; flex-direction: row; align-items: center; gap: 2px; }
+.tiptap-toolbar-row { flex-wrap: nowrap; gap: 2px; }
+.tiptap-toolbar-group-label { display: none; }
+.tiptap-toolbar button { height: 34px; border: 0; border-radius: 4px; color: #444746; font-size: 22px; font-weight: 500; }
+.tiptap-toolbar button svg { width: 20px; height: 20px; }
+.tiptap-toolbar button:hover { background: #dfe5ee; }
+.tiptap-toolbar button.is-active { background: #d3e3fd; color: #174ea6; }
+.tiptap-text-style-controls { gap: 2px; }
+.tiptap-toolbar select { height: 34px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #444746; font: inherit; font-size: 14px; cursor: pointer; }
+.tiptap-toolbar select:hover { background-color: #dfe5ee; }
+.tiptap-block-style { width: 120px; }
+.tiptap-font-control select { width: 132px; text-overflow: ellipsis; }
+.tiptap-size-control { display: flex; align-items: center; margin: 0 4px; padding-left: 4px; border-left: 1px solid #c7cbd1; }
+.tiptap-size-control select { width: 54px; height: 30px; border: 1px solid #80868b; text-align: center; appearance: none; }
+.tiptap-color-control { position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 34px; border-radius: 4px; cursor: pointer; }
+.tiptap-color-control:hover { background: #dfe5ee; }
+.tiptap-color-control > span { font-size: 22px; line-height: 25px; border-bottom: 4px solid var(--text-color, #101828); padding: 0 3px; }
+.tiptap-color-control input[type="color"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.tiptap-toolbar button.tiptap-color-reset { width: 26px; padding: 0; font-size: 18px; }
+.tiptap-toolbar button:focus-visible,
+.tiptap-toolbar select:focus-visible,
+.tiptap-color-control:focus-within { outline: 2px solid #1a73e8; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .tiptap-toolbar-group--font .tiptap-text-style-controls { justify-content: flex-start; }
+}

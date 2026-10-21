@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Editor } from '@tiptap/core'
 import { useEditorState } from '@tiptap/react'
 
@@ -34,7 +35,7 @@ function corHex(value: string): string {
   return /^#[0-9a-f]{6}$/i.test(ctx.fillStyle) ? ctx.fillStyle : '#101828'
 }
 
-export function TipTapTextStyleControls({ editor }: { editor: Editor }) {
+export function TipTapTextStyleControls({ editor, children }: { editor: Editor; children?: ReactNode }) {
   const estilos = useEditorState({
     editor,
     selector: ({ editor }) => ({
@@ -44,9 +45,15 @@ export function TipTapTextStyleControls({ editor }: { editor: Editor }) {
     }),
   })
 
+  function ajustarTamanho(delta: number) {
+    const atual = Number.parseFloat(estilos.tamanho) || 16
+    const unidade = estilos.tamanho.endsWith('pt') ? 'pt' : 'px'
+    editor.chain().focus().setFontSize(`${Math.min(96, Math.max(8, atual + delta))}${unidade}`).run()
+  }
+
   return (
     <div className="tiptap-text-style-controls">
-      <label>Fonte
+      <label className="tiptap-font-control"><span className="tiptap-sr-only">Fonte</span>
         <select aria-label="Fonte" value={estilos.fonte} onChange={(event) => {
           const value = event.target.value
           const chain = editor.chain().focus()
@@ -60,7 +67,9 @@ export function TipTapTextStyleControls({ editor }: { editor: Editor }) {
           {FONTES.map(([label, value]) => <option key={value} value={value}>{label}</option>)}
         </select>
       </label>
-      <label>Tamanho
+      <div className="tiptap-size-control" role="group" aria-label="Tamanho do texto">
+      <button type="button" aria-label="Diminuir tamanho da fonte" data-tooltip="Diminuir tamanho da fonte" onClick={() => ajustarTamanho(-1)}>&minus;</button>
+      <label><span className="tiptap-sr-only">Tamanho</span>
         <select aria-label="Tamanho da fonte" value={estilos.tamanho} onChange={(event) => {
           const value = event.target.value
           const chain = editor.chain().focus()
@@ -71,18 +80,22 @@ export function TipTapTextStyleControls({ editor }: { editor: Editor }) {
           {estilos.tamanho === MISTO && <option value={MISTO} disabled>Mistos</option>}
           {estilos.tamanho && estilos.tamanho !== MISTO && !TAMANHOS.includes(estilos.tamanho) &&
             <option value={estilos.tamanho}>{estilos.tamanho}</option>}
-          {TAMANHOS.map((value) => <option key={value} value={value}>{value.replace('px', ' px')}</option>)}
+          {TAMANHOS.map((value) => <option key={value} value={value}>{value.replace('px', '')}</option>)}
         </select>
       </label>
-      <label>Cor
+      <button type="button" aria-label="Aumentar tamanho da fonte" data-tooltip="Aumentar tamanho da fonte" onClick={() => ajustarTamanho(1)}>+</button>
+      </div>
+      {children}
+      <label className="tiptap-color-control" title="Cor do texto" style={{ '--text-color': corHex(estilos.cor) } as import('react').CSSProperties}>
+        <span aria-hidden="true">A</span>
         <input type="color" aria-label="Cor do texto" value={corHex(estilos.cor)}
           onChange={(event) => editor.chain().focus().setColor(event.target.value).run()} />
       </label>
-      <span className="tiptap-color-status" aria-live="polite">
+      <span className="tiptap-sr-only" aria-live="polite">
         {estilos.cor === MISTO ? 'Mistas' : estilos.cor ? corHex(estilos.cor) : 'Padrão'}
       </span>
       <button type="button" className="tiptap-color-reset" aria-label="Restaurar cor padrão"
-        onClick={() => editor.chain().focus().unsetColor().run()}>Cor padrão</button>
+        onClick={() => editor.chain().focus().unsetColor().run()}>&#8634;<span className="tiptap-sr-only">Cor padrão</span></button>
     </div>
   )
 }
