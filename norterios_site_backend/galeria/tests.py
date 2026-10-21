@@ -8,7 +8,7 @@ from django.urls import reverse
 from PIL import Image
 from rest_framework.test import APITestCase
 
-from .models import Album, Foto
+from .models import Album, Categoria, Foto
 
 TEST_STORAGES = {
     **settings.STORAGES,
@@ -147,3 +147,25 @@ class AlbumApiTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
+
+
+class GaleriaCategoriaFilterTests(APITestCase):
+    def test_lista_somente_categorias_com_albuns_publicados_sem_duplicar(self):
+        publica = Categoria.objects.create(nome='Eventos', slug='eventos')
+        privada = Categoria.objects.create(nome='Rascunhos', slug='rascunhos')
+        Categoria.objects.create(nome='Vazia', slug='vazia')
+        Album.objects.create(titulo='Evento um', categoria=publica, publicado=True)
+        Album.objects.create(titulo='Evento dois', categoria=publica, publicado=True)
+        Album.objects.create(titulo='Rascunho', categoria=privada, publicado=False)
+        response = self.client.get(reverse('galeria-categoria-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([item['slug'] for item in response.data], ['eventos'])
+
+    def test_categoria_desaparece_ao_despublicar_ultimo_album(self):
+        categoria = Categoria.objects.create(nome='Eventos', slug='eventos')
+        album = Album.objects.create(titulo='Evento', categoria=categoria, publicado=True)
+        album.publicado = False
+        album.save()
+        response = self.client.get(reverse('galeria-categoria-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])

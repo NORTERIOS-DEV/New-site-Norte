@@ -45,6 +45,6 @@ class AlbumViewSet(ReadOnlyModelViewSet):
 
 
 class CategoriaViewSet(ReadOnlyModelViewSet):
-    queryset = Categoria.objects.all()
+    queryset = Categoria.objects.filter(albuns__publicado=True).distinct()
     serializer_class = CategoriaSerializer
     pagination_class = None
