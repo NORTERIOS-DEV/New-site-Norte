@@ -174,12 +174,25 @@ class PostPainelApiTests(APITestCase):
         self.assertIn(publicado.id, ids_publicado)
         self.assertNotIn(agendado.id, ids_publicado)
 
-    def test_apenas_um_post_fica_em_destaque(self):
-        post1 = Post.objects.create(titulo='Um', resumo='R', autor=self.autor, destaque=True)
-        post2 = Post.objects.create(titulo='Dois', resumo='R', autor=self.autor, destaque=True)
+    def test_permite_tres_destaques_e_rejeita_quarto_sem_desmarcar(self):
+        posts = [Post.objects.create(titulo=f'Destaque {i}', resumo='R', autor=self.autor, destaque=True) for i in range(3)]
+        response = self._criar_post(destaque=True)
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn('destaque', response.data)
+        self.assertEqual(set(Post.objects.filter(destaque=True).values_list('pk', flat=True)), {post.pk for post in posts})
+        with self.assertRaises(ValidationError):
+            Post.objects.create(titulo='Quarto', resumo='R', autor=self.autor, destaque=True)
 
-        post1.refresh_from_db()
-        post2.refresh_from_db()
-        self.assertFalse(post1.destaque)
-        self.assertTrue(post2.destaque)
-        self.assertEqual(Post.objects.filter(destaque=True).count(), 1)
+    def test_edita_destaque_no_limite_e_libera_vaga_ao_desmarcar(self):
+        posts = [Post.objects.create(titulo=f'Destaque {i}', resumo='R', autor=self.autor, destaque=True) for i in range(3)]
+        outro = Post.objects.create(titulo='Outro', resumo='R', autor=self.autor)
+        url = reverse('painel-post-detail', args=[outro.pk])
+        response = self.client.patch(url, {'destaque': True}, format='json')
+        self.assertEqual(response.status_code, 400, response.data)
+        response = self.client.patch(reverse('painel-post-detail', args=[posts[0].pk]), {'titulo': 'Editado', 'destaque': True}, format='json')
+        self.assertEqual(response.status_code, 200, response.data)
+        response = self.client.patch(reverse('painel-post-detail', args=[posts[0].pk]), {'destaque': False}, format='json')
+        self.assertEqual(response.status_code, 200, response.data)
+        response = self.client.patch(url, {'destaque': True}, format='json')
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(Post.objects.filter(destaque=True).count(), 3)

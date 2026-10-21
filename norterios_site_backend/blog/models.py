@@ -1,5 +1,5 @@
-from django.db import models, transaction
-from django.db.models import Q, UniqueConstraint
+from django.core.exceptions import ValidationError
+from django.db import connections, models, router, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -140,9 +140,6 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-data_publicacao', '-data_criacao']
-        constraints = [
-            UniqueConstraint(fields=['destaque'], condition=Q(destaque=True), name='post_unico_destaque'),
-        ]
 
     def __str__(self):
         return self.titulo
@@ -176,9 +173,21 @@ class Post(models.Model):
         if not self.tempo_leitura_minutos and self.conteudo_json:
             self.tempo_leitura_minutos = estimate_reading_time(self.conteudo_json)
 
-        if self.destaque:
-            with transaction.atomic():
-                Post.objects.filter(destaque=True).exclude(pk=self.pk).update(destaque=False)
-                super().save(*args, **kwargs)
-        else:
+        using = kwargs.get('using') or router.db_for_write(Post, instance=self)
+        with transaction.atomic(using=using):
+            if self.destaque:
+                # Serializa a contagem e a gravacao entre requisicoes no PostgreSQL.
+                connection = connections[using]
+                if connection.vendor == 'postgresql':
+                    with connection.cursor() as cursor:
+                        cursor.execute('SELECT pg_advisory_xact_lock(%s)', [730031])
+                self.validar_limite_destaques(using)
             super().save(*args, **kwargs)
+
+    def validar_limite_destaques(self, using=None):
+        if self.destaque and Post.objects.using(using).filter(destaque=True).exclude(pk=self.pk).count() >= 3:
+            raise ValidationError({'destaque': 'No máximo 3 posts podem ficar em destaque. Desmarque um antes de adicionar outro.'})
+
+    def clean(self):
+        super().clean()
+        self.validar_limite_destaques()

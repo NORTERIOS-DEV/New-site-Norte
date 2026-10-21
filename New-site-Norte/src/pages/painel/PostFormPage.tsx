@@ -517,7 +517,7 @@ export function PostFormPage() {
               <input type="checkbox" {...register('destaque')} />
               Destaque na home
             </label>
-            <small className="painel-field-hint">Desmarca automaticamente o destaque de qualquer outro post.</small>
+            <small className="painel-field-hint">Selecione até 3 posts em destaque. O mais recente aparece maior, acima dos outros dois.</small>
           </div>}
         </div>
 

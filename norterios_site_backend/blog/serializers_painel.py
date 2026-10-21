@@ -81,6 +81,18 @@ class PostPainelSerializer(serializers.ModelSerializer):
         # conteudo_json daqui pra frente.
         read_only_fields = ['data_criacao', 'data_atualizacao', 'conteudo']
 
+    def create(self, validated_data):
+        try:
+            return super().create(validated_data)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.message_dict)
+
+    def update(self, instance, validated_data):
+        try:
+            return super().update(instance, validated_data)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.message_dict)
+
     def get_categoria_nome(self, obj):
         return obj.categoria.nome if obj.categoria_id else None
 
